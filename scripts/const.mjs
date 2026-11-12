@@ -28,7 +28,6 @@ export const SETTINGS = {
   timeFormat: "timeFormat",
   playerPanel: "playerPanel",
   panelFade: "panelFade",
-  hideSystemClock: "hideSystemClock",
   panelPosition: "panelPosition",
   panelCollapsed: "panelCollapsed"
 };

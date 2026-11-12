@@ -2,6 +2,12 @@
 
 All notable changes to this module are documented here.
 
+## 0.0.7
+
+- Dropped the *Hide the system's own clock* setting again. The D&D 5e system already has one of its own under its
+  calendar preferences, and a second switch for the same thing only makes it harder to find the one that counts.
+- The panel's starting position, added in 0.0.6, stays.
+
 ## 0.0.6
 
 - **Hide the system's own clock.** A new per-client setting takes the clock a game system keeps at the top of the

@@ -28,14 +28,6 @@ export class ControlPanel {
   /* -------------------------------------------- */
 
   /**
-   * Hide or restore the clock the game system keeps at the top of the screen, so the two do not sit on top of each
-   * other. Nothing is written to the system's own settings; the bar is only taken out of view on this client.
-   */
-  static applySystemClockVisibility() {
-    document.body?.classList.toggle("ew-hide-system-clock", Boolean(setting(SETTINGS.hideSystemClock, false)));
-  }
-
-  /**
    * The panel of this client, created on first use.
    * @returns {ControlPanel}
    */
@@ -60,7 +52,6 @@ export class ControlPanel {
    * @returns {Promise<void>}
    */
   async render() {
-    ControlPanel.applySystemClockVisibility();
     if ( !ControlPanel.visible ) return this.close();
     if ( this.#rendering ) return;
     this.#rendering = true;

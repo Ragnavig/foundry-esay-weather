@@ -16,12 +16,6 @@
   font-family: var(--font-primary, "Signika", sans-serif);
 }
 
-/*
- * The game system may keep a clock of its own at the top of the screen. When this module's panel takes that job
- * over, the system's bar is only hidden from view here — its own setting is left alone.
- */
-body.ew-hide-system-clock #calendar-hud { display: none !important; }
-
 /* -------------------------------------------- */
 /*  Floating control panel                      */
 /* -------------------------------------------- */

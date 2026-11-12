@@ -185,7 +185,5 @@
   "EASYWEATHER.Settings.PanelFade.Name": "Panel ausblenden, wenn die Maus nicht darauf ist",
   "EASYWEATHER.Settings.PanelFade.Hint": "Das Panel liegt dezent im Hintergrund und wird wieder voll sichtbar, sobald die Maus darüber ist.",
   "EASYWEATHER.DateLineFestival": "{festival} {year}",
-  "EASYWEATHER.CalendarApp.Festival": "Festtag",
-  "EASYWEATHER.Settings.HideSystemClock.Name": "Zeitleiste des Systems ausblenden",
-  "EASYWEATHER.Settings.HideSystemClock.Hint": "Nimmt die Uhr, die das Spielsystem oben am Bildschirm zeigt, aus der Ansicht, damit dieses Panel die einzige bleibt. Wird nur auf deinem Bildschirm ausgeblendet; die Einstellung des Systems bleibt unangetastet."
+  "EASYWEATHER.CalendarApp.Festival": "Festtag"
 }
