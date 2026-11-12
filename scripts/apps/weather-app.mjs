@@ -2,7 +2,7 @@ import { MODULE_ID, SETTINGS, loc, setSetting, setting } from "../const.mjs";
 import { CLIMATES, INTENSITIES, WEATHER_TYPES } from "../weather-data.mjs";
 import { currentMoment } from "../calendar.mjs";
 import {
-  activeClimate, announceWeather, currentWeather, describeWeather, muteEffect, rollAndSetWeather, setWeather
+  activeClimate, announceWeather, currentWeather, describeWeather, isMuted, muteEffect, rollAndSetWeather, setWeather
 } from "../weather.mjs";
 import { availableSceneEffects, flash, sceneEffectFor } from "../effects.mjs";
 
@@ -183,15 +183,18 @@ export class WeatherApp extends HandlebarsApplicationMixin(ApplicationV2) {
     const key = target.dataset.key;
     // The overlay, the flashes and the ambience are per-client comfort settings as well as part of the weather,
     // so a GM turning one off here turns it off for the world while a player only silences their own screen.
+    const clientKey = { overlay: SETTINGS.overlay, lightning: SETTINGS.lightning, sound: SETTINGS.sound }[key];
+
     if ( !game.user.isGM ) {
-      const map = { overlay: SETTINGS.overlay, lightning: SETTINGS.lightning, sound: SETTINGS.sound };
-      const key2 = map[key];
-      if ( !key2 ) return;
-      await setSetting(key2, !setting(key2, true));
+      if ( clientKey ) await setSetting(clientKey, !setting(clientKey, key !== "sound"));
       this.render(false);
       return;
     }
-    await muteEffect(key);
+
+    const muted = isMuted(key);
+    // Turning a layer back on should actually show it, even when this screen had switched it off earlier.
+    if ( muted && clientKey ) await setSetting(clientKey, true);
+    await muteEffect(key, !muted);
     this.render(false);
   }
 
