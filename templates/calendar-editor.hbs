@@ -1,0 +1,162 @@
+<div class="ew-editor-body">
+
+  <section class="ew-card">
+    <h3 class="ew-section">{{localize "EASYWEATHER.Editor.Basics"}}</h3>
+    <div class="ew-grid-2">
+      <label class="ew-field">
+        <span>{{localize "EASYWEATHER.Editor.Name"}}</span>
+        <input type="text" name="name" value="{{calendar.name}}">
+      </label>
+      <label class="ew-field">
+        <span>{{localize "EASYWEATHER.Editor.StartYear"}}</span>
+        <input type="number" name="startYear" value="{{calendar.startYear}}">
+      </label>
+      <label class="ew-field">
+        <span>{{localize "EASYWEATHER.Editor.HoursPerDay"}}</span>
+        <input type="number" name="time.hoursPerDay" min="1" value="{{calendar.time.hoursPerDay}}">
+      </label>
+      <label class="ew-field">
+        <span>{{localize "EASYWEATHER.Editor.MinutesPerHour"}}</span>
+        <input type="number" name="time.minutesPerHour" min="1" value="{{calendar.time.minutesPerHour}}">
+      </label>
+      <label class="ew-field">
+        <span>{{localize "EASYWEATHER.Editor.SecondsPerMinute"}}</span>
+        <input type="number" name="time.secondsPerMinute" min="1" value="{{calendar.time.secondsPerMinute}}">
+      </label>
+      <label class="ew-field">
+        <span>{{localize "EASYWEATHER.Editor.FirstWeekday"}}</span>
+        <input type="number" name="firstWeekday" min="0" value="{{calendar.firstWeekday}}">
+      </label>
+      <label class="ew-field">
+        <span>{{localize "EASYWEATHER.Editor.LeapInterval"}}</span>
+        <input type="number" name="leap.interval" min="0" value="{{calendar.leap.interval}}">
+      </label>
+      <label class="ew-field">
+        <span>{{localize "EASYWEATHER.Editor.LeapSkip"}}</span>
+        <input type="number" name="leap.skip" min="0" value="{{calendar.leap.skip}}">
+      </label>
+      <label class="ew-field">
+        <span>{{localize "EASYWEATHER.Editor.LeapSkipException"}}</span>
+        <input type="number" name="leap.skipException" min="0" value="{{calendar.leap.skipException}}">
+      </label>
+      <label class="ew-field">
+        <span>{{localize "EASYWEATHER.Editor.DaylightBase"}}</span>
+        <input type="number" name="daylight.base" step="0.5" value="{{calendar.daylight.base}}">
+      </label>
+      <label class="ew-field">
+        <span>{{localize "EASYWEATHER.Editor.DaylightVariation"}}</span>
+        <input type="number" name="daylight.variation" step="0.5" value="{{calendar.daylight.variation}}">
+      </label>
+    </div>
+
+    <div class="ew-row ew-preset-row">
+      <select name="preset">
+        {{#each presets}}<option value="{{id}}">{{name}}</option>{{/each}}
+      </select>
+      <button type="button" class="ew-btn ew-ghost" data-action="loadPreset">
+        <i class="fa-solid fa-download"></i> {{localize "EASYWEATHER.Editor.LoadPreset"}}
+      </button>
+      <button type="button" class="ew-btn ew-ghost" data-action="reset">
+        <i class="fa-solid fa-rotate-left"></i> {{localize "EASYWEATHER.Editor.Reset"}}
+      </button>
+    </div>
+  </section>
+
+  <section class="ew-card">
+    <div class="ew-notes-head">
+      <h3 class="ew-section">{{localize "EASYWEATHER.Editor.Months"}}</h3>
+      <button type="button" class="ew-icon" data-action="addRow" data-list="months"><i class="fa-solid fa-plus"></i></button>
+    </div>
+    <div class="ew-rows">
+      {{#each calendar.months}}
+      <div class="ew-row-item">
+        <input type="text" name="months.{{@index}}.name" value="{{name}}" placeholder="{{localize 'EASYWEATHER.Editor.Name'}}">
+        <input type="text" name="months.{{@index}}.abbr" value="{{abbr}}" class="ew-narrow" placeholder="{{localize 'EASYWEATHER.Editor.Abbr'}}">
+        <input type="number" name="months.{{@index}}.days" value="{{days}}" min="1" class="ew-narrow"
+               data-tooltip="{{localize 'EASYWEATHER.Editor.Days'}}">
+        <input type="number" name="months.{{@index}}.leapDays" value="{{leapDays}}" min="0" class="ew-narrow"
+               data-tooltip="{{localize 'EASYWEATHER.Editor.LeapDays'}}">
+        <button type="button" class="ew-icon ew-danger" data-action="removeRow" data-list="months" data-index="{{@index}}">
+          <i class="fa-solid fa-trash"></i>
+        </button>
+      </div>
+      {{/each}}
+    </div>
+  </section>
+
+  <section class="ew-card">
+    <div class="ew-notes-head">
+      <h3 class="ew-section">{{localize "EASYWEATHER.Editor.Weekdays"}}</h3>
+      <button type="button" class="ew-icon" data-action="addRow" data-list="weekdays"><i class="fa-solid fa-plus"></i></button>
+    </div>
+    <div class="ew-rows">
+      {{#each calendar.weekdays}}
+      <div class="ew-row-item">
+        <input type="text" name="weekdays.{{@index}}.name" value="{{name}}">
+        <input type="text" name="weekdays.{{@index}}.abbr" value="{{abbr}}" class="ew-narrow">
+        <button type="button" class="ew-icon ew-danger" data-action="removeRow" data-list="weekdays" data-index="{{@index}}">
+          <i class="fa-solid fa-trash"></i>
+        </button>
+      </div>
+      {{/each}}
+    </div>
+  </section>
+
+  <section class="ew-card">
+    <div class="ew-notes-head">
+      <h3 class="ew-section">{{localize "EASYWEATHER.Editor.Seasons"}}</h3>
+      <button type="button" class="ew-icon" data-action="addRow" data-list="seasons"><i class="fa-solid fa-plus"></i></button>
+    </div>
+    <div class="ew-rows">
+      {{#each calendar.seasons}}
+      <div class="ew-row-item">
+        <input type="hidden" name="seasons.{{@index}}.id" value="{{id}}">
+        <input type="text" name="seasons.{{@index}}.name" value="{{localize name}}">
+        <select name="seasons.{{@index}}.icon" class="ew-narrow-select">
+          {{#each ../seasonIcons}}
+          <option value="{{this}}" {{#if (ewEq this ../icon)}}selected{{/if}}>{{this}}</option>
+          {{/each}}
+        </select>
+        <input type="color" name="seasons.{{@index}}.color" value="{{color}}" class="ew-color">
+        <input type="number" name="seasons.{{@index}}.month" value="{{month}}" min="0" class="ew-narrow"
+               data-tooltip="{{localize 'EASYWEATHER.Editor.StartMonth'}}">
+        <input type="number" name="seasons.{{@index}}.day" value="{{day}}" min="0" class="ew-narrow"
+               data-tooltip="{{localize 'EASYWEATHER.Editor.StartDay'}}">
+        <button type="button" class="ew-icon ew-danger" data-action="removeRow" data-list="seasons" data-index="{{@index}}">
+          <i class="fa-solid fa-trash"></i>
+        </button>
+      </div>
+      {{/each}}
+    </div>
+    <p class="ew-muted ew-hint">{{localize "EASYWEATHER.Editor.SeasonHint"}}</p>
+  </section>
+
+  <section class="ew-card">
+    <div class="ew-notes-head">
+      <h3 class="ew-section">{{localize "EASYWEATHER.Editor.Moons"}}</h3>
+      <button type="button" class="ew-icon" data-action="addRow" data-list="moons"><i class="fa-solid fa-plus"></i></button>
+    </div>
+    <div class="ew-rows">
+      {{#each calendar.moons}}
+      <div class="ew-row-item">
+        <input type="text" name="moons.{{@index}}.name" value="{{name}}">
+        <input type="number" name="moons.{{@index}}.cycle" value="{{cycle}}" step="0.01" min="1" class="ew-narrow"
+               data-tooltip="{{localize 'EASYWEATHER.Editor.Cycle'}}">
+        <input type="number" name="moons.{{@index}}.offset" value="{{offset}}" class="ew-narrow"
+               data-tooltip="{{localize 'EASYWEATHER.Editor.Offset'}}">
+        <input type="color" name="moons.{{@index}}.color" value="{{color}}" class="ew-color">
+        <button type="button" class="ew-icon ew-danger" data-action="removeRow" data-list="moons" data-index="{{@index}}">
+          <i class="fa-solid fa-trash"></i>
+        </button>
+      </div>
+      {{/each}}
+    </div>
+  </section>
+
+</div>
+
+<footer class="ew-editor-footer">
+  <button type="submit" class="ew-btn">
+    <i class="fa-solid fa-floppy-disk"></i> {{localize "EASYWEATHER.Editor.Save"}}
+  </button>
+</footer>

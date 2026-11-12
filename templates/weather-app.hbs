@@ -1,0 +1,101 @@
+<section class="ew-weather-app" style="--ew-accent: {{weather.type.color}}">
+
+  <div class="ew-hero">
+    <div class="ew-hero-icon"><i class="fa-solid {{weather.type.icon}}"></i></div>
+    <div class="ew-hero-text">
+      <h2>{{weather.label}}</h2>
+      <p>{{weather.intensityLabel}} · {{weather.temperatureLabel}} · {{weather.windLabel}}</p>
+      <p class="ew-muted">{{moment.date}} — {{seasonName}}</p>
+    </div>
+    {{#if isGM}}
+    <div class="ew-hero-actions">
+      <button type="button" class="ew-btn" data-action="roll">
+        <i class="fa-solid fa-dice-d20"></i> {{localize "EASYWEATHER.WeatherApp.Roll"}}
+      </button>
+      <button type="button" class="ew-btn ew-ghost" data-action="announce">
+        <i class="fa-solid fa-comment"></i> {{localize "EASYWEATHER.WeatherApp.Announce"}}
+      </button>
+      <button type="button" class="ew-btn ew-ghost {{#unless weather.enabled}}ew-off{{/unless}}" data-action="toggleAll">
+        <i class="fa-solid fa-power-off"></i>
+        {{#if weather.enabled}}{{localize "EASYWEATHER.WeatherApp.EffectsOn"}}{{else}}{{localize "EASYWEATHER.WeatherApp.EffectsOff"}}{{/if}}
+      </button>
+    </div>
+    {{/if}}
+  </div>
+
+  <h3 class="ew-section">{{localize "EASYWEATHER.WeatherApp.Effects"}}</h3>
+  <div class="ew-toggles">
+    {{#each toggles}}
+    <button type="button" class="ew-toggle {{#if on}}on{{/if}} {{#if disabled}}disabled{{/if}}"
+            data-action="toggleEffect" data-key="{{key}}" data-tooltip="{{hint}}">
+      <i class="fa-solid {{icon}}"></i>
+      <span>{{label}}</span>
+      <span class="ew-switch"></span>
+    </button>
+    {{/each}}
+  </div>
+
+  <div class="ew-sliders">
+    <label class="ew-field">
+      <span>{{localize "EASYWEATHER.WeatherApp.OverlayStrength"}}</span>
+      <input type="range" name="strength" min="0" max="100" step="5" value="{{strength}}">
+    </label>
+    {{#if isGM}}
+    <label class="ew-field">
+      <span>{{localize "EASYWEATHER.WeatherApp.Temperature"}}</span>
+      <input type="number" name="temperature" value="{{weather.temperature}}" step="1">
+    </label>
+    <label class="ew-field">
+      <span>{{localize "EASYWEATHER.WeatherApp.Wind"}}</span>
+      <input type="range" name="wind" min="0" max="5" step="1" value="{{weather.wind}}">
+    </label>
+    {{/if}}
+  </div>
+
+  {{#if isGM}}
+  <h3 class="ew-section">{{localize "EASYWEATHER.WeatherApp.Intensity"}}</h3>
+  <div class="ew-segmented">
+    {{#each intensities}}
+    <button type="button" class="{{#if active}}active{{/if}}" data-action="setIntensity" data-intensity="{{id}}">
+      {{name}}
+    </button>
+    {{/each}}
+  </div>
+
+  <h3 class="ew-section">{{localize "EASYWEATHER.WeatherApp.Types"}}</h3>
+  <div class="ew-type-grid">
+    {{#each types}}
+    <button type="button" class="ew-type {{#if active}}active{{/if}}" data-action="setType" data-type="{{id}}"
+            style="--ew-type: {{color}}" data-tooltip="{{name}}">
+      <i class="fa-solid {{icon}}"></i>
+      <span>{{name}}</span>
+    </button>
+    {{/each}}
+  </div>
+
+  <h3 class="ew-section">{{localize "EASYWEATHER.WeatherApp.Climate"}}</h3>
+  <div class="ew-row">
+    <select name="climate">
+      {{#each climates}}
+      <option value="{{id}}" {{#if active}}selected{{/if}}>{{name}}</option>
+      {{/each}}
+    </select>
+    <button type="button" class="ew-btn ew-ghost" data-action="testFlash">
+      <i class="fa-solid fa-bolt"></i> {{localize "EASYWEATHER.WeatherApp.TestFlash"}}
+    </button>
+  </div>
+  {{/if}}
+
+  <h3 class="ew-section">{{localize "EASYWEATHER.WeatherApp.Outlook"}}</h3>
+  <ul class="ew-outlook">
+    {{#each outlook}}
+    <li>
+      <i class="fa-solid {{icon}}" style="color: {{color}}"></i>
+      <span class="ew-outlook-name">{{name}}</span>
+      <span class="ew-bar"><span style="width: {{percent}}%; background: {{color}}"></span></span>
+      <span class="ew-outlook-value">{{percent}}%</span>
+    </li>
+    {{/each}}
+  </ul>
+
+</section>

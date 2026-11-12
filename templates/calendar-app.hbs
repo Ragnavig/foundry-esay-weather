@@ -1,0 +1,102 @@
+<section class="ew-calendar-app">
+
+  <header class="ew-cal-head">
+    <div class="ew-cal-nav">
+      <button type="button" class="ew-icon" data-action="prevYear" data-tooltip="{{localize 'EASYWEATHER.CalendarApp.PrevYear'}}">
+        <i class="fa-solid fa-angles-left"></i>
+      </button>
+      <button type="button" class="ew-icon" data-action="prevMonth" data-tooltip="{{localize 'EASYWEATHER.CalendarApp.PrevMonth'}}">
+        <i class="fa-solid fa-chevron-left"></i>
+      </button>
+    </div>
+    <div class="ew-cal-title">
+      <h2>{{monthName}}</h2>
+      <span>{{view.year}}{{#if leapYear}} · {{localize "EASYWEATHER.CalendarApp.LeapYear"}}{{/if}}</span>
+    </div>
+    <div class="ew-cal-nav">
+      <button type="button" class="ew-icon" data-action="nextMonth" data-tooltip="{{localize 'EASYWEATHER.CalendarApp.NextMonth'}}">
+        <i class="fa-solid fa-chevron-right"></i>
+      </button>
+      <button type="button" class="ew-icon" data-action="nextYear" data-tooltip="{{localize 'EASYWEATHER.CalendarApp.NextYear'}}">
+        <i class="fa-solid fa-angles-right"></i>
+      </button>
+      <button type="button" class="ew-icon" data-action="today" data-tooltip="{{localize 'EASYWEATHER.CalendarApp.Today'}}">
+        <i class="fa-solid fa-crosshairs"></i>
+      </button>
+      {{#if isGM}}
+      <button type="button" class="ew-icon" data-action="edit" data-tooltip="{{localize 'EASYWEATHER.Editor.Title'}}">
+        <i class="fa-solid fa-pen-ruler"></i>
+      </button>
+      {{/if}}
+    </div>
+  </header>
+
+  <div class="ew-cal-layout">
+
+    <div class="ew-grid-wrap">
+      <div class="ew-weekdays" style="--ew-columns: {{weekdays.length}}">
+        {{#each weekdays}}<span data-tooltip="{{name}}">{{abbr}}</span>{{/each}}
+      </div>
+      <div class="ew-grid" style="--ew-columns: {{weekdays.length}}">
+        {{#each days}}
+        {{#if blank}}
+        <span class="ew-day ew-blank"></span>
+        {{else}}
+        <button type="button" class="ew-day {{#if isToday}}today{{/if}} {{#if isSelected}}selected{{/if}}"
+                data-action="selectDay" data-day-index="{{dayIndex}}" style="--ew-season: {{seasonColor}}">
+          <span class="ew-day-number">{{day}}</span>
+          {{#if notes.length}}<span class="ew-day-dot"></span>{{/if}}
+        </button>
+        {{/if}}
+        {{/each}}
+      </div>
+    </div>
+
+    <aside class="ew-cal-side">
+      <div class="ew-selected" style="--ew-accent: {{selected.seasonColor}}">
+        <span class="ew-muted">{{localize "EASYWEATHER.CalendarApp.Selected"}}</span>
+        <h3>{{selected.label}}</h3>
+        <p class="ew-muted">{{selected.seasonName}}</p>
+        {{#each selected.moons}}
+        <p class="ew-moon-line"><span class="ew-moon">{{phase.icon}}</span> {{name}} — {{phaseName}}</p>
+        {{/each}}
+        {{#if isGM}}
+        <button type="button" class="ew-btn" data-action="travel">
+          <i class="fa-solid fa-clock"></i> {{localize "EASYWEATHER.CalendarApp.Travel"}}
+        </button>
+        {{/if}}
+      </div>
+
+      <div class="ew-notes">
+        <div class="ew-notes-head">
+          <h4>{{localize "EASYWEATHER.Note.Heading"}}</h4>
+          {{#if isGM}}
+          <button type="button" class="ew-icon" data-action="addNote" data-tooltip="{{localize 'EASYWEATHER.Note.Add'}}">
+            <i class="fa-solid fa-plus"></i>
+          </button>
+          {{/if}}
+        </div>
+        {{#each selected.notes}}
+        <div class="ew-note">
+          <div class="ew-note-text">
+            <strong>{{title}}</strong>
+            {{#if text}}<p>{{text}}</p>{{/if}}
+          </div>
+          {{#if ../isGM}}
+          <button type="button" class="ew-icon ew-danger" data-action="deleteNote" data-note-id="{{id}}">
+            <i class="fa-solid fa-trash"></i>
+          </button>
+          {{/if}}
+        </div>
+        {{else}}
+        <p class="ew-muted ew-empty">{{localize "EASYWEATHER.Note.Empty"}}</p>
+        {{/each}}
+      </div>
+
+      <div class="ew-today-line">
+        <i class="fa-solid fa-clock"></i> {{today}} — {{moment.clock.time}}{{moment.clock.suffix}}
+      </div>
+    </aside>
+
+  </div>
+</section>

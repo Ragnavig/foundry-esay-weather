@@ -1,0 +1,14 @@
+<div class="easy-weather ew-chat-card" style="--ew-accent: {{weather.type.color}}">
+  <header>
+    <i class="fa-solid {{weather.type.icon}}"></i>
+    <div>
+      <strong>{{weather.label}}</strong>
+      <span class="ew-chat-date">{{date}}</span>
+    </div>
+  </header>
+  <ul class="ew-chat-meta">
+    <li><i class="fa-solid fa-temperature-high"></i> {{weather.temperatureLabel}}</li>
+    <li><i class="fa-solid fa-wind"></i> {{weather.windLabel}}</li>
+    <li><i class="fa-solid {{moment.components.season.icon}}"></i> {{localize moment.components.season.name}}</li>
+  </ul>
+</div>

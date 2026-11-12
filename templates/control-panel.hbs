@@ -1,0 +1,71 @@
+<div class="ew-panel-inner">
+
+  <header class="ew-drag">
+    <i class="ew-season fa-solid {{moment.components.season.icon}}" style="color: {{moment.components.season.color}}"
+       data-tooltip="{{seasonName}}"></i>
+    <span class="ew-date">{{date}}</span>
+    <button type="button" class="ew-icon ew-collapse" data-action="collapse"
+            data-tooltip="{{localize 'EASYWEATHER.Panel.Collapse'}}">
+      <i class="fa-solid fa-chevron-up"></i>
+    </button>
+  </header>
+
+  <div class="ew-body">
+
+    <div class="ew-top">
+      <div class="ew-clock">
+        <span class="ew-time">{{clock.time}}</span>
+        {{#if clock.suffix}}<span class="ew-suffix">{{clock.suffix}}</span>{{/if}}
+      </div>
+      <button type="button" class="ew-weather-chip" data-action="weather"
+              data-tooltip="{{localize 'EASYWEATHER.Panel.OpenWeather'}}">
+        <i class="fa-solid {{weather.type.icon}}" style="color: {{weather.type.color}}"></i>
+        <span class="ew-weather-text">
+          <span class="ew-weather-label">{{weather.label}}</span>
+          <span class="ew-weather-meta">{{weather.temperatureLabel}} · {{weather.windLabel}}</span>
+        </span>
+      </button>
+    </div>
+
+    {{#if isGM}}
+    <div class="ew-steps">
+      <button type="button" class="ew-icon ew-reverse {{#if reverse}}active{{/if}}" data-action="reverse"
+              data-tooltip="{{localize 'EASYWEATHER.Panel.Reverse'}}">
+        <i class="fa-solid fa-rotate-left"></i>
+      </button>
+      {{#each steps}}
+      <button type="button" class="ew-step" data-action="step" data-step="{{id}}">
+        <span class="ew-sign">{{#if ../reverse}}&minus;{{else}}+{{/if}}</span>{{label}}
+      </button>
+      {{/each}}
+    </div>
+
+    <div class="ew-tools">
+      {{#each jumps}}
+      <button type="button" class="ew-icon" data-action="jump" data-jump="{{id}}" data-tooltip="{{label}}">
+        <i class="fa-solid {{icon}}"></i>
+      </button>
+      {{/each}}
+      <span class="ew-spacer"></span>
+      <button type="button" class="ew-icon" data-action="roll" data-tooltip="{{localize 'EASYWEATHER.Panel.Roll'}}">
+        <i class="fa-solid fa-dice-d20"></i>
+      </button>
+      <button type="button" class="ew-icon" data-action="calendar"
+              data-tooltip="{{localize 'EASYWEATHER.Panel.OpenCalendar'}}">
+        <i class="fa-solid fa-calendar-days"></i>
+      </button>
+    </div>
+    {{else}}
+    <div class="ew-tools">
+      <button type="button" class="ew-icon" data-action="calendar"
+              data-tooltip="{{localize 'EASYWEATHER.Panel.OpenCalendar'}}">
+        <i class="fa-solid fa-calendar-days"></i>
+      </button>
+      {{#if moon}}
+      <span class="ew-moon" data-tooltip="{{moon.name}}">{{moon.phase.icon}}</span>
+      {{/if}}
+    </div>
+    {{/if}}
+
+  </div>
+</div>
