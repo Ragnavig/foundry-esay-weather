@@ -190,5 +190,7 @@
   "EASYWEATHER.Settings.CloudRenderer.Hint": "On the canvas, the shadows lie on the ground: they pan and zoom with the map and a shadow stays over the same hill. Over the screen is the older, flatter drawing that sits in front of everything.",
   "EASYWEATHER.Settings.CloudRenderer.Canvas": "On the map",
   "EASYWEATHER.Settings.CloudRenderer.Screen": "Over the screen",
-  "EASYWEATHER.Settings.CloudRenderer.Off": "No cloud shadows"
+  "EASYWEATHER.Settings.CloudRenderer.Off": "No cloud shadows",
+  "EASYWEATHER.Toggle.Clouds": "Cloud shadows",
+  "EASYWEATHER.Toggle.CloudsHint": "Shadows cast on the ground by the cloud cover, drawn on the map itself."
 }

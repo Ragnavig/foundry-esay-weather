@@ -131,8 +131,9 @@ export function applyCloudShadows(weather, moment) {
   try {
     const type = WEATHER_TYPES[weather?.type];
     const cover = type?.cloud ?? 0;
-    const on = usesCanvasClouds() && (weather?.enabled !== false) && !weather?.muted?.overlay
-      && setting(SETTINGS.overlay, true) && (cover > 0);
+    // The shadows have a switch of their own. They are on the map rather than over the screen, so the overlay's
+    // switch has nothing to say about them.
+    const on = usesCanvasClouds() && (weather?.enabled !== false) && !weather?.muted?.clouds && (cover > 0);
 
     if ( !on ) {
       if ( sprite && !sprite.destroyed ) sprite.alpha = 0;
@@ -151,8 +152,10 @@ export function applyCloudShadows(weather, moment) {
     const grid = canvas.grid?.size || 100;
     shadows.tileScale.set((grid * SHADOW_GRIDS) / BLOB_SIZE);
 
+    // Even a lightly clouded sky needs a visible shadow: the texture itself is gentle, and multiplying a faint
+    // sprite onto the ground comes out as almost nothing. Cover decides how much darker it gets from there.
     const strength = clamp(Number(setting(SETTINGS.overlayStrength, 70)) / 100, 0, 1);
-    shadows.alpha = clamp(cover * strength * 1.1, 0, 1);
+    shadows.alpha = clamp((0.45 + (cover * 0.65)) * strength, 0, 1);
 
     // One direction for the whole table, changing from day to day, and faster the stronger the wind.
     const day = moment?.components?.dayIndex ?? 0;

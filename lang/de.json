@@ -190,5 +190,7 @@
   "EASYWEATHER.Settings.CloudRenderer.Hint": "Auf der Karte liegen die Schatten auf dem Boden: Sie wandern und zoomen mit der Karte, ein Schatten bleibt über demselben Hügel. Über dem Bildschirm ist die ältere, flachere Darstellung, die vor allem anderen liegt.",
   "EASYWEATHER.Settings.CloudRenderer.Canvas": "Auf der Karte",
   "EASYWEATHER.Settings.CloudRenderer.Screen": "Über dem Bildschirm",
-  "EASYWEATHER.Settings.CloudRenderer.Off": "Keine Wolkenschatten"
+  "EASYWEATHER.Settings.CloudRenderer.Off": "Keine Wolkenschatten",
+  "EASYWEATHER.Toggle.Clouds": "Wolkenschatten",
+  "EASYWEATHER.Toggle.CloudsHint": "Schatten, die die Bewölkung auf den Boden wirft, direkt auf der Karte gezeichnet."
 }

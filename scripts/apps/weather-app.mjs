@@ -75,6 +75,11 @@ export class WeatherApp extends HandlebarsApplicationMixin(ApplicationV2) {
           disabled: !game.user.isGM || (setting(SETTINGS.sceneEffects, "current") === "off")
         },
         {
+          key: "clouds", icon: "fa-cloud", label: loc("EASYWEATHER.Toggle.Clouds"),
+          on: !weather.muted?.clouds && (setting(SETTINGS.cloudRenderer, "canvas") !== "off"),
+          hint: loc("EASYWEATHER.Toggle.CloudsHint"), disabled: !weather.type.cloud
+        },
+        {
           key: "overlay", icon: "fa-brush", label: loc("EASYWEATHER.Toggle.Overlay"),
           on: !weather.muted?.overlay && setting(SETTINGS.overlay, true), hint: loc("EASYWEATHER.Toggle.OverlayHint")
         },
@@ -185,8 +190,13 @@ export class WeatherApp extends HandlebarsApplicationMixin(ApplicationV2) {
     // so a GM turning one off here turns it off for the world while a player only silences their own screen.
     const clientKey = { overlay: SETTINGS.overlay, lightning: SETTINGS.lightning, sound: SETTINGS.sound }[key];
 
+    // The cloud shadows are drawn by a renderer this client picks, so their own switch is a string rather than a
+    // flag. Turning them off here leaves a chosen renderer alone, so turning them on again restores it.
+    const cloudsOff = () => setting(SETTINGS.cloudRenderer, "canvas") === "off";
+
     if ( !game.user.isGM ) {
-      if ( clientKey ) await setSetting(clientKey, !setting(clientKey, key !== "sound"));
+      if ( key === "clouds" ) await setSetting(SETTINGS.cloudRenderer, cloudsOff() ? "canvas" : "off");
+      else if ( clientKey ) await setSetting(clientKey, !setting(clientKey, key !== "sound"));
       this.render(false);
       return;
     }
@@ -194,6 +204,7 @@ export class WeatherApp extends HandlebarsApplicationMixin(ApplicationV2) {
     const muted = isMuted(key);
     // Turning a layer back on should actually show it, even when this screen had switched it off earlier.
     if ( muted && clientKey ) await setSetting(clientKey, true);
+    if ( muted && (key === "clouds") && cloudsOff() ) await setSetting(SETTINGS.cloudRenderer, "canvas");
     await muteEffect(key, !muted);
     this.render(false);
   }

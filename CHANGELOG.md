@@ -2,6 +2,15 @@
 
 All notable changes to this module are documented here.
 
+## 0.1.1
+
+- **The cloud shadows have a switch of their own.** They were held back by the overlay's switch, so turning the
+  screen-space overlay off — a reasonable thing to do now that the shadows are on the map — silently took the
+  clouds with it, and a clouded sky showed nothing at all.
+- The shadows were far too faint. A gentle texture multiplied onto the ground at a fraction of its opacity came
+  out as almost nothing; a lightly clouded sky now starts from a visible shadow and cloud cover decides how much
+  darker it gets.
+
 ## 0.1.0
 
 - **Cloud shadows are drawn on the map.** They live in Foundry's own weather layer now, so they carry the canvas
