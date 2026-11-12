@@ -24,6 +24,8 @@ Built for **Foundry VTT v13 and v14**, system-agnostic.
 - **Uses Foundry's own world calendar** (`game.time.calendar`) by default, so the date shown is the date the world is
   set to — months, weekdays, seasons, leap years and the length of a day all come from there. A world that needs
   something it cannot express switches to this module's own calendar in one click.
+- **Festival days** of calendars that declare them — Midwinter, Greengrass, Shieldmeet and the rest on Harptos —
+  are named instead of numbered, and marked in the grid.
 - A month at a glance, with the season colouring every day, the day's moon phase and a marker on days that carry a note.
 - **Travel to this day** moves the world clock to the day you picked, keeping the time of day.
 - **Notes per day** for festivals, deadlines and whatever the table needs to remember.

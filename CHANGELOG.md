@@ -2,6 +2,19 @@
 
 All notable changes to this module are documented here.
 
+## 0.0.5
+
+- **Every date in the calendar was wrong.** `CalendarData#componentsToTime` reads the day of the *year* and ignores
+  `dayOfMonth`, which this module was passing. The month is now folded into the day count first, the way the D&D 5e
+  system does it in `jumpToDate`. This fixes the month grid, travelling to a day, the season colouring, the notes
+  and the moon phases — all of which hung off the wrong day.
+- **The year is the year the world shows.** Confirmed against the system's own source: every formatted date is
+  built from `components.year + calendar.years.yearZero`. A Harptos world set to 4883 no longer reads 3382. The
+  guess-from-the-timestamp heuristic of 0.0.4 is gone — Foundry's `timestamp` formatter does not add `yearZero`,
+  so it was the one string that could not answer the question.
+- Festival days of a calendar that declares them (Midwinter, Greengrass, Shieldmeet and the rest on Harptos) are
+  named on the panel and marked in the month grid.
+
 ## 0.0.4
 
 - **The year is the year the world shows.** Foundry's components count years from the calendar's year zero, while

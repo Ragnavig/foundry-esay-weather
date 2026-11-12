@@ -183,5 +183,7 @@
   "EASYWEATHER.Settings.DungeonMode.Name": "Dungeon mode",
   "EASYWEATHER.Settings.DungeonMode.Hint": "Underground there is no sky. Holds back the visible weather, stops the scene darkness from following the day, and skips the weather roll at the start of a new day. The world keeps its weather, so stepping back outside picks it up again.",
   "EASYWEATHER.Settings.PanelFade.Name": "Fade the panel when not pointed at",
-  "EASYWEATHER.Settings.PanelFade.Hint": "The panel sits quietly at low opacity and comes back to full as soon as the mouse is over it."
+  "EASYWEATHER.Settings.PanelFade.Hint": "The panel sits quietly at low opacity and comes back to full as soon as the mouse is over it.",
+  "EASYWEATHER.DateLineFestival": "{festival}, {year}",
+  "EASYWEATHER.CalendarApp.Festival": "Festival day"
 }

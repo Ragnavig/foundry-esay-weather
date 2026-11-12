@@ -415,6 +415,15 @@
 .ew-calendar-app .ew-day.today { border-color: var(--ew-season, #888); box-shadow: inset 0 0 0 1px var(--ew-season, #888); font-weight: 700; }
 .ew-calendar-app .ew-day.selected { background: color-mix(in srgb, var(--ew-season, #888) 48%, transparent); border-color: #fff; }
 
+.ew-calendar-app .ew-day.festival { border-color: #d8b24a; }
+.ew-calendar-app .ew-day-festival {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  font-size: 7px;
+  color: #d8b24a;
+}
+
 .ew-calendar-app .ew-day-dot {
   position: absolute;
   bottom: 4px;

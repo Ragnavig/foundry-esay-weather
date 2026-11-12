@@ -1,7 +1,7 @@
 import { MODULE_ID, SETTINGS, formDataClass, loc, setSetting, setting } from "../const.mjs";
 import {
   activeCalendar, componentsOf, currentMoment, dateFromDayIndex, dayIndexFromDate, daysInMonth, isLeapYear,
-  moonPhases, noteKey, seasonForDate
+  festivalOn, moonPhases, noteKey, seasonForDate
 } from "../calendar.mjs";
 import { setDate } from "../time.mjs";
 import { CalendarEditor } from "./calendar-editor.mjs";
@@ -84,6 +84,7 @@ export class CalendarApp extends HandlebarsApplicationMixin(ApplicationV2) {
         isToday: dayIndex === moment.components.dayIndex,
         isSelected: dayIndex === selected,
         notes: notes[noteKey(dayIndex)] ?? [],
+        festival: festivalOn(view.month, day, calendar),
         moon: (moonPhases(dayIndex, calendar)[0] ?? null)
       });
     }
@@ -104,7 +105,9 @@ export class CalendarApp extends HandlebarsApplicationMixin(ApplicationV2) {
       selected: {
         dayIndex: selected,
         ...selectedDate,
-        label: `${calendar.months[selectedDate.month]?.name ?? ""} ${selectedDate.day + 1}, ${selectedDate.year}`,
+        label: festivalOn(selectedDate.month, selectedDate.day, calendar)
+          ?? `${calendar.months[selectedDate.month]?.name ?? ""} ${selectedDate.day + 1}, ${selectedDate.year}`,
+        festival: festivalOn(selectedDate.month, selectedDate.day, calendar),
         seasonName: loc(selectedSeason?.name ?? ""),
         seasonColor: selectedSeason?.color ?? "#888",
         moons: moonPhases(selected, calendar).map(moon => ({ ...moon, phaseName: loc(moon.phase.name) })),

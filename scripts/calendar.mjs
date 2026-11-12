@@ -69,30 +69,19 @@ function seasonLook(name, index) {
 }
 
 /**
- * How far Foundry's own display of a year sits from the raw `year` of its components.
+ * How far the year a world shows sits from the raw `year` of Foundry's components.
  *
- * `TimeComponents#year` counts the years elapsed since the calendar's year zero, while the world shows the year the
- * calendar actually names. Rather than guess which way `yearZero` is applied, the offset is read back out of
- * Foundry's own formatted timestamp, so the module always prints the same year the world does.
+ * `TimeComponents#year` counts the years elapsed since the calendar's year zero, while the world names the year
+ * itself. The D&D 5e system makes the rule explicit in `CalendarData5e`: every formatted date is built with
+ * `components.year + calendar.years.yearZero`, and `jumpToDate` takes the visible year and subtracts `yearZero`
+ * back out again. Foundry's own `timestamp` formatter skips that step, which is why it cannot be used to work the
+ * offset out.
  *
- * @param {CalendarData} fc  Foundry's calendar.
- * @param {object} config    Its configuration.
+ * @param {object} config  The calendar's configuration.
  * @returns {number}
  */
-function yearOffsetOf(fc, config) {
-  const zero = Number(config.years?.yearZero) || 0;
-  if ( !zero ) return 0;
-  try {
-    const time = game.time.worldTime;
-    const year = fc.timeToComponents(time).year;
-    const printed = String(fc.format(time, "timestamp"));
-    for ( const offset of [zero, -zero, 0] ) {
-      if ( printed.includes(String(year + offset)) ) return offset;
-    }
-  } catch(err) {
-    // The formatter is optional; the plain offset is still the better guess than none.
-  }
-  return zero;
+function yearOffsetOf(config) {
+  return Number(config.years?.yearZero) || 0;
 }
 
 /**
@@ -133,7 +122,7 @@ function fromFoundryCalendar() {
   return {
     source: "foundry",
     fc,
-    yearOffset: yearOffsetOf(fc, config),
+    yearOffset: yearOffsetOf(config),
     name: localize(config.name) || loc("EASYWEATHER.Calendar.Foundry"),
     time: {
       secondsPerMinute: days.secondsPerMinute ?? 60,
@@ -244,6 +233,7 @@ export function componentsOf(worldTime, calendar=activeCalendar()) {
   if ( calendar.fc ) {
     const c = calendar.fc.timeToComponents(worldTime);
     const weekdayIndex = c.dayOfWeek ?? 0;
+    const festival = festivalOn(c.month ?? 0, c.dayOfMonth ?? 0, calendar);
     return {
       year: c.year + (calendar.yearOffset ?? 0),
       month: c.month ?? 0,
@@ -259,7 +249,8 @@ export function componentsOf(worldTime, calendar=activeCalendar()) {
       seasonIndex: c.season ?? 0,
       seasonCount: calendar.seasons.length,
       dayOfYear: (c.day ?? 0) + 1,
-      leapYear: Boolean(c.leapYear)
+      leapYear: Boolean(c.leapYear),
+      festival
     };
   }
 
@@ -331,10 +322,11 @@ export function dateFromDayIndex(dayIndex, calendar) {
  */
 export function worldTimeFromDate(date, calendar=activeCalendar()) {
   if ( calendar.fc ) {
+    // `componentsToTime` reads the day of the *year* and ignores `dayOfMonth`, so the month has to be folded into
+    // the day count first. The D&D 5e system does the same thing in `CalendarData5e#jumpToDate`.
     return calendar.fc.componentsToTime({
-      year: date.year - (calendar.yearOffset ?? 0),
-      month: date.month ?? 0,
-      dayOfMonth: date.day ?? 0,
+      year: (date.year ?? 0) - (calendar.yearOffset ?? 0),
+      day: dayOfYear(date.year, date.month ?? 0, date.day ?? 0, calendar) - 1,
       hour: date.hour ?? 0,
       minute: date.minute ?? 0,
       second: date.second ?? 0
@@ -386,6 +378,28 @@ export function dayOfYear(year, month, day, calendar) {
 /* -------------------------------------------- */
 /*  Seasons                                     */
 /* -------------------------------------------- */
+
+/**
+ * The name of the festival falling on a date, for calendars that declare any.
+ *
+ * Harptos, for one, puts Midwinter, Greengrass and the rest between the months rather than inside them, and the
+ * day then carries the festival's name instead of a number.
+ *
+ * @param {number} month       Zero-based month index.
+ * @param {number} day         Zero-based day of the month.
+ * @param {object} [calendar]  Calendar to ask.
+ * @returns {string|null}
+ */
+export function festivalOn(month, day, calendar=activeCalendar()) {
+  const find = calendar.fc?.findFestivalDay;
+  if ( typeof find !== "function" ) return null;
+  try {
+    const festival = find.call(calendar.fc, { month, dayOfMonth: day });
+    return festival?.name ? game.i18n.localize(festival.name) : null;
+  } catch(err) {
+    return null;
+  }
+}
 
 /**
  * The placeholder used when a calendar has no seasons at all.
@@ -500,6 +514,12 @@ export function formatTime(components, calendar=activeCalendar()) {
  * @returns {string}
  */
 export function formatDate(components, calendar=activeCalendar()) {
+  if ( components.festival ) {
+    return loc("EASYWEATHER.DateLineFestival", {
+      festival: components.festival,
+      year: components.year
+    }).trim();
+  }
   return loc("EASYWEATHER.DateLine", {
     weekday: components.weekday?.name ?? "",
     day: components.day + 1,

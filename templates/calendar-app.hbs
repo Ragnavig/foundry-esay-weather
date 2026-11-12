@@ -42,9 +42,11 @@
         {{#if blank}}
         <span class="ew-day ew-blank"></span>
         {{else}}
-        <button type="button" class="ew-day {{#if isToday}}today{{/if}} {{#if isSelected}}selected{{/if}}"
-                data-action="selectDay" data-day-index="{{dayIndex}}" style="--ew-season: {{seasonColor}}">
+        <button type="button" class="ew-day {{#if isToday}}today{{/if}} {{#if isSelected}}selected{{/if}} {{#if festival}}festival{{/if}}"
+                data-action="selectDay" data-day-index="{{dayIndex}}" style="--ew-season: {{seasonColor}}"
+                {{#if festival}}data-tooltip="{{festival}}"{{/if}}>
           <span class="ew-day-number">{{day}}</span>
+          {{#if festival}}<i class="ew-day-festival fa-solid fa-star"></i>{{/if}}
           {{#if notes.length}}<span class="ew-day-dot"></span>{{/if}}
         </button>
         {{/if}}
@@ -56,7 +58,7 @@
       <div class="ew-selected" style="--ew-accent: {{selected.seasonColor}}">
         <span class="ew-muted">{{localize "EASYWEATHER.CalendarApp.Selected"}}</span>
         <h3>{{selected.label}}</h3>
-        <p class="ew-muted">{{selected.seasonName}}</p>
+        <p class="ew-muted">{{selected.seasonName}}{{#if selected.festival}} · {{localize "EASYWEATHER.CalendarApp.Festival"}}{{/if}}</p>
         {{#each selected.moons}}
         <p class="ew-moon-line"><span class="ew-moon">{{phase.icon}}</span> {{name}} — {{phaseName}}</p>
         {{/each}}
