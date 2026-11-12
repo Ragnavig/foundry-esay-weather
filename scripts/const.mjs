@@ -19,6 +19,7 @@ export const SETTINGS = {
   announce: "announce",
   sceneEffects: "sceneEffects",
   overlay: "overlay",
+  cloudRenderer: "cloudRenderer",
   overlayStrength: "overlayStrength",
   lightning: "lightning",
   sound: "sound",

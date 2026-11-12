@@ -185,5 +185,10 @@
   "EASYWEATHER.Settings.PanelFade.Name": "Fade the panel when not pointed at",
   "EASYWEATHER.Settings.PanelFade.Hint": "The panel sits quietly at low opacity and comes back to full as soon as the mouse is over it.",
   "EASYWEATHER.DateLineFestival": "{festival}, {year}",
-  "EASYWEATHER.CalendarApp.Festival": "Festival day"
+  "EASYWEATHER.CalendarApp.Festival": "Festival day",
+  "EASYWEATHER.Settings.CloudRenderer.Name": "Cloud shadows",
+  "EASYWEATHER.Settings.CloudRenderer.Hint": "On the canvas, the shadows lie on the ground: they pan and zoom with the map and a shadow stays over the same hill. Over the screen is the older, flatter drawing that sits in front of everything.",
+  "EASYWEATHER.Settings.CloudRenderer.Canvas": "On the map",
+  "EASYWEATHER.Settings.CloudRenderer.Screen": "Over the screen",
+  "EASYWEATHER.Settings.CloudRenderer.Off": "No cloud shadows"
 }

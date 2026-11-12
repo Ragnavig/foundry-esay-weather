@@ -1,6 +1,7 @@
 import { MODULE_ID, SETTINGS, clamp, isPrimaryGM, logError, setting } from "./const.mjs";
 import { INTENSITIES, WEATHER_TYPES } from "./weather-data.mjs";
 import { currentMoment } from "./calendar.mjs";
+import { applyCloudShadows, tearDownCloudShadows, usesCanvasClouds } from "./cloud-shadows.mjs";
 
 /**
  * Turns a weather state into something you can see.
@@ -100,6 +101,7 @@ export function applyWeather(weather) {
   if ( setting(SETTINGS.dungeonMode, false) ) weather = { ...weather, enabled: false };
 
   applyOverlay(weather);
+  applyCloudShadows(weather, currentMoment());
   applyLightning(weather);
   applyAmbientSound(weather);
   if ( isPrimaryGM() ) {
@@ -123,6 +125,9 @@ export function applyOverlay(weather) {
 
   const on = (weather.enabled !== false) && setting(SETTINGS.overlay, true) && !weather.muted?.overlay;
   element.className = on ? `ew-${WEATHER_TYPES[weather.type]?.overlay ?? "clear"}` : "ew-off";
+
+  // The cloud shadows may be drawn on the canvas instead, in which case the overlay leaves them alone.
+  element.dataset.clouds = setting(SETTINGS.cloudRenderer, "canvas");
 
   const factor = INTENSITIES[weather.intensity]?.factor ?? 1;
   const strength = clamp(Number(setting(SETTINGS.overlayStrength, 70)) / 100, 0, 1);
@@ -308,8 +313,10 @@ export function applyDarkness(weather) {
 
 /* -------------------------------------------- */
 
+export { usesCanvasClouds };
+
 /**
- * Remove everything this module draws.
+ * Remove everything this module draws on the screen. The canvas layer has a teardown of its own.
  */
 export function tearDownEffects() {
   if ( lightningTimer ) window.clearTimeout(lightningTimer);
@@ -318,6 +325,7 @@ export function tearDownEffects() {
   ambientSound = null;
   overlay?.remove();
   overlay = null;
+  tearDownCloudShadows();
 }
 
 /** @type {string} */

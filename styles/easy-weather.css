@@ -576,6 +576,10 @@
   animation: ew-drift calc(var(--ew-speed) * 7) ease-in-out infinite;
 }
 
+/* With the shadows drawn on the canvas, the screen-space cloud layer stands down. */
+#easy-weather-overlay[data-clouds="canvas"] .ew-clouds,
+#easy-weather-overlay[data-clouds="off"] .ew-clouds { opacity: 0 !important; }
+
 #easy-weather-overlay.ew-partly-cloudy .ew-clouds { opacity: calc(var(--ew-strength) * 0.45); }
 #easy-weather-overlay.ew-windy .ew-clouds,
 #easy-weather-overlay.ew-leaves .ew-clouds { opacity: calc(var(--ew-strength) * 0.4); }

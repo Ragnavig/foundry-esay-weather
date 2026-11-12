@@ -52,10 +52,11 @@ picks it up where it left off.
 
 ### What you see
 - Foundry's own particle effects (rain, snow, fog, leaves …) on the current scene or on every scene.
-- A canvas overlay this module draws on top. The **cloud shadows and the haze belong to the map**: they carry the
-  canvas's own transform, so a cloud stays over the same hill while you pan and zoom. Tint, vignette and lightning
-  stay in screen space. Only soft, blurred shapes — nothing tiled, so it never reads as a pattern over the map.
-  Strength slider per client.
+- **Cloud shadows drawn on the map itself**, inside Foundry's weather layer: they lie on the ground, pan and zoom
+  with it, and are hidden by whatever hides that layer. A shadow is about eight grid squares across and the sky
+  drifts with the wind. Switchable per client between the map, the older screen-space drawing, and none.
+- A canvas overlay for the rest — tint, haze and a darker rim in rough weather. Only soft, blurred shapes, nothing
+  tiled, so it never reads as a pattern over the map. Strength slider per client.
 - Lightning flashes during a thunderstorm.
 
 ---

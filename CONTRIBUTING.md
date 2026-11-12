@@ -14,6 +14,7 @@ Bug reports and pull requests are welcome.
 | `scripts/weather-data.mjs` | weather types, climates, season tables and intensities |
 | `scripts/weather.mjs` | rolling and storing the weather |
 | `scripts/effects.mjs` | everything you can see: particles, overlay, lightning, darkness |
+| `scripts/cloud-shadows.mjs` | the cloud shadows drawn into Foundry's weather layer |
 | `scripts/apps/` | the control panel, the calendar, the editor and the weather window |
 | `templates/`, `styles/`, `lang/` | markup, stylesheet and translations |
 | `test/` | two dependency-free Node scripts that check the calendar maths |

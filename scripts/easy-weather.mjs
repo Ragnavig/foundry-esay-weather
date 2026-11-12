@@ -4,6 +4,7 @@ import * as Calendar from "./calendar.mjs";
 import * as Time from "./time.mjs";
 import * as Weather from "./weather.mjs";
 import * as Effects from "./effects.mjs";
+import * as Clouds from "./cloud-shadows.mjs";
 import { CALENDAR_PRESETS } from "./presets.mjs";
 import { CLIMATES, INTENSITIES, WEATHER_TYPES } from "./weather-data.mjs";
 import { ControlPanel } from "./apps/control-panel.mjs";
@@ -42,6 +43,7 @@ Hooks.once("init", () => {
     time: Time,
     weather: Weather,
     effects: Effects,
+    clouds: Clouds,
     data: { CALENDAR_PRESETS, CLIMATES, WEATHER_TYPES, INTENSITIES },
     apps: { CalendarApp, CalendarEditor, WeatherApp, ControlPanel },
     openCalendar: () => new CalendarApp().render({ force: true }),
@@ -103,7 +105,12 @@ Hooks.on("canvasReady", () => {
 
 // The clouds belong to the map, so they have to follow every pan and every zoom.
 Hooks.on("canvasPan", () => Effects.alignToMap());
-Hooks.on("canvasTearDown", () => Effects.alignToMap());
+
+// The shadow sprite belongs to the scene being torn down, so it goes with it and is rebuilt for the next one.
+Hooks.on("canvasTearDown", () => {
+  Clouds.tearDownCloudShadows();
+  Effects.alignToMap();
+});
 
 /* -------------------------------------------- */
 /*  Scene controls                              */

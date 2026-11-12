@@ -160,6 +160,19 @@ export function registerSettings() {
     onChange: () => Hooks.callAll("easyWeather.weatherChanged")
   });
 
+  client(SETTINGS.cloudRenderer, {
+    name: "EASYWEATHER.Settings.CloudRenderer.Name",
+    hint: "EASYWEATHER.Settings.CloudRenderer.Hint",
+    type: String,
+    default: "canvas",
+    choices: {
+      canvas: "EASYWEATHER.Settings.CloudRenderer.Canvas",
+      css: "EASYWEATHER.Settings.CloudRenderer.Screen",
+      off: "EASYWEATHER.Settings.CloudRenderer.Off"
+    },
+    onChange: () => Hooks.callAll("easyWeather.weatherChanged")
+  });
+
   client(SETTINGS.overlayStrength, {
     name: "EASYWEATHER.Settings.OverlayStrength.Name",
     hint: "EASYWEATHER.Settings.OverlayStrength.Hint",

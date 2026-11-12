@@ -2,6 +2,16 @@
 
 All notable changes to this module are documented here.
 
+## 0.1.0
+
+- **Cloud shadows are drawn on the map.** They live in Foundry's own weather layer now, so they carry the canvas
+  transform and its masks: the shadows lie on the ground, pan and zoom with it, and a shadow stays over the same
+  hill instead of sliding across the screen. The texture is drawn at run time — no image ships with the module —
+  and every blob is painted wrapped around the edges so the tile repeats without a seam.
+- A shadow is about eight grid squares across, so it reads as a cloud at the zoom a scene is actually played at.
+  The whole sky drifts one way, decided by the day so every client agrees, and faster the stronger the wind.
+- New per-client setting *Cloud shadows*: on the map, over the screen (the previous drawing), or none.
+
 ## 0.0.7
 
 - Dropped the *Hide the system's own clock* setting again. The D&D 5e system already has one of its own under its
