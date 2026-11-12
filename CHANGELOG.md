@@ -2,6 +2,11 @@
 
 All notable changes to this module are documented here.
 
+## 0.0.2
+
+- Switching a weather layer off on your own screen and then back on in the weather window shows it again instead of
+  leaving it hidden.
+
 ## 0.0.1 — first preview
 
 - Floating control panel with date, clock and current weather; draggable, collapsible, and visible to players when
