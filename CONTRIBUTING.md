@@ -16,6 +16,7 @@ Bug reports and pull requests are welcome.
 | `scripts/effects.mjs` | everything you can see: particles, overlay, lightning, darkness |
 | `scripts/apps/` | the control panel, the calendar, the editor and the weather window |
 | `templates/`, `styles/`, `lang/` | markup, stylesheet and translations |
+| `test/` | two dependency-free Node scripts that check the calendar maths |
 
 ## Rules of thumb
 
@@ -32,6 +33,16 @@ Bug reports and pull requests are welcome.
   window, not behind the master switch alone.
 - **Never block on an effect.** Anything that draws is wrapped so a failure cannot break a render or a time step.
 - Keep new strings in `lang/en.json` and `lang/de.json`; both files must hold the same keys.
+
+## Checks
+
+```bash
+node test/own-calendar.test.mjs
+node test/foundry-calendar.test.mjs
+```
+
+The stubs in `test/foundry-calendar.test.mjs` mirror behaviour measured against a running world, not what the API
+documentation implies. See `test/README.md` before changing them.
 
 ## Releases
 
