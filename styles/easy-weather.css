@@ -79,7 +79,7 @@
 #easy-weather-panel .ew-suffix { font-size: 13px; margin-left: 3px; color: var(--ew-muted); }
 
 #easy-weather-panel .ew-weather-chip {
-  flex: 1;
+  flex: 1 1 auto;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -102,7 +102,7 @@
 #easy-weather-panel .ew-tools { display: flex; align-items: center; gap: 4px; }
 
 #easy-weather-panel .ew-step {
-  flex: 1;
+  flex: 1 1 0;
   padding: 5px 0;
   font-size: 11px;
   font-weight: 600;
@@ -150,6 +150,25 @@
   color: var(--ew-text);
   padding: 12px;
 }
+
+/*
+ * Foundry gives every button a fixed height and a row layout of its own. The panels here stack an icon above a label,
+ * so those defaults have to be undone before anything else is styled, or the label lands on top of the icon.
+ */
+.easy-weather button {
+  height: auto;
+  min-height: 0;
+  min-width: 0;
+  width: auto;
+  line-height: 1.2;
+  font-family: inherit;
+  text-shadow: none;
+  box-shadow: none;
+  flex: 0 0 auto;
+}
+
+.easy-weather button > i { margin: 0; }
+.easy-weather button:disabled { cursor: default; }
 
 .easy-weather .ew-section {
   margin: 14px 0 7px;
@@ -236,6 +255,7 @@
 
 .ew-weather-app .ew-toggle {
   display: flex;
+  width: 100%;
   align-items: center;
   gap: 8px;
   padding: 9px 11px;
@@ -282,7 +302,7 @@
 .ew-weather-app .ew-segmented { display: flex; gap: 4px; background: var(--ew-bg-soft); padding: 3px; border-radius: 10px; }
 
 .ew-weather-app .ew-segmented button {
-  flex: 1;
+  flex: 1 1 0;
   border: none;
   background: transparent;
   color: var(--ew-muted);
@@ -295,14 +315,18 @@
 
 .ew-weather-app .ew-segmented button.active { background: var(--ew-accent); color: #0d1117; }
 
-.ew-weather-app .ew-type-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 7px; }
+.ew-weather-app .ew-type-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 8px; }
 
 .ew-weather-app .ew-type {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 5px;
-  padding: 9px 4px;
+  justify-content: center;
+  gap: 6px;
+  min-height: 66px;
+  height: auto;
+  padding: 10px 4px;
+  overflow: hidden;
   border-radius: 11px;
   border: 1px solid var(--ew-border);
   background: var(--ew-bg-soft);
@@ -311,7 +335,15 @@
   font-size: 10px;
 }
 
-.ew-weather-app .ew-type i { font-size: 17px; color: var(--ew-type); }
+.ew-weather-app .ew-type i { font-size: 18px; line-height: 1; color: var(--ew-type); }
+.ew-weather-app .ew-type span {
+  display: block;
+  width: 100%;
+  line-height: 1.15;
+  text-align: center;
+  overflow-wrap: anywhere;
+  hyphens: auto;
+}
 .ew-weather-app .ew-type:hover { background: var(--ew-bg-hover); color: var(--ew-text); }
 
 .ew-weather-app .ew-type.active {
@@ -354,6 +386,8 @@
 .ew-calendar-app .ew-day {
   position: relative;
   aspect-ratio: 1 / 1;
+  min-height: 34px;
+  height: auto;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -393,7 +427,7 @@
 }
 
 .ew-calendar-app .ew-selected h3 { margin: 2px 0 2px; font-size: 15px; }
-.ew-calendar-app .ew-selected .ew-btn { margin-top: 9px; width: 100%; }
+.ew-calendar-app .ew-selected .ew-btn { margin-top: 9px; width: 100%; flex: 0 0 auto; }
 .ew-calendar-app .ew-moon-line { margin: 4px 0 0; font-size: 11px; color: var(--ew-muted); }
 .ew-calendar-app .ew-moon { font-size: 13px; }
 
@@ -422,6 +456,10 @@
 .ew-editor .ew-narrow { width: 62px; flex: 0 0 62px; }
 .ew-editor .ew-narrow-select { width: 118px; flex: 0 0 118px; }
 .ew-editor .ew-color { width: 34px; flex: 0 0 34px; height: 26px; padding: 2px; border-radius: 8px; border: 1px solid var(--ew-border); background: transparent; }
+.ew-editor .ew-banner { display: flex; align-items: center; gap: 11px; }
+.ew-editor .ew-banner > div { flex: 1; }
+.ew-editor .ew-banner > i { font-size: 17px; color: var(--ew-accent); }
+.ew-editor .ew-banner p { margin: 2px 0 0; }
 .ew-editor .ew-preset-row { margin-top: 10px; }
 .ew-editor .ew-preset-row select { flex: 1; }
 .ew-editor .ew-hint { margin: 8px 0 0; }
@@ -448,157 +486,131 @@
 /*  The weather you can see                     */
 /* -------------------------------------------- */
 
+/*
+ * Only soft, blurred shapes live here. Rain, snow and leaves are drawn by Foundry's own particle layer, which looks
+ * far better than anything a repeating gradient can do — a tiled pattern over the canvas reads as scan lines, not
+ * as weather.
+ */
+
 #easy-weather-overlay {
   position: absolute;
   inset: 0;
   overflow: hidden;
   pointer-events: none;
-  z-index: 2;
+  z-index: 1;
   --ew-strength: 0.7;
   --ew-speed: 10s;
+  contain: strict;
 }
 
-#easy-weather-overlay .ew-layer { position: absolute; inset: -15%; opacity: 0; transition: opacity 1.2s ease; }
+#easy-weather-overlay .ew-layer {
+  position: absolute;
+  inset: -20%;
+  opacity: 0;
+  transition: opacity 1.4s ease;
+  will-change: opacity, transform;
+}
+
 #easy-weather-overlay.ew-off .ew-layer { opacity: 0 !important; }
 
-/* Tint ------------------------------------- */
+/* A flat wash of colour ---------------------- */
 #easy-weather-overlay .ew-tint { background: #0a1420; }
-#easy-weather-overlay.ew-cloudy .ew-tint,
-#easy-weather-overlay.ew-overcast .ew-tint { opacity: calc(var(--ew-strength) * 0.18); }
-#easy-weather-overlay.ew-rain-light .ew-tint { opacity: calc(var(--ew-strength) * 0.2); }
-#easy-weather-overlay.ew-rain .ew-tint { opacity: calc(var(--ew-strength) * 0.28); }
-#easy-weather-overlay.ew-storm .ew-tint { opacity: calc(var(--ew-strength) * 0.4); }
-#easy-weather-overlay.ew-snow .ew-tint,
-#easy-weather-overlay.ew-hail .ew-tint { background: #9fc3e0; opacity: calc(var(--ew-strength) * 0.14); }
-#easy-weather-overlay.ew-blizzard .ew-tint { background: #cfe3f2; opacity: calc(var(--ew-strength) * 0.3); }
-#easy-weather-overlay.ew-fog .ew-tint { background: #b9c2cc; opacity: calc(var(--ew-strength) * 0.22); }
-#easy-weather-overlay.ew-heat .ew-tint { background: #ff9b3d; opacity: calc(var(--ew-strength) * 0.16); }
-#easy-weather-overlay.ew-sandstorm .ew-tint { background: #d9ae6a; opacity: calc(var(--ew-strength) * 0.34); }
-#easy-weather-overlay.ew-clear .ew-tint { background: #ffd98a; opacity: calc(var(--ew-strength) * 0.05); }
+#easy-weather-overlay.ew-clear .ew-tint { background: #ffd98a; opacity: calc(var(--ew-strength) * 0.06); }
 #easy-weather-overlay.ew-partly-cloudy .ew-tint { opacity: calc(var(--ew-strength) * 0.08); }
 #easy-weather-overlay.ew-windy .ew-tint,
-#easy-weather-overlay.ew-leaves .ew-tint { opacity: calc(var(--ew-strength) * 0.08); }
+#easy-weather-overlay.ew-leaves .ew-tint { opacity: calc(var(--ew-strength) * 0.09); }
+#easy-weather-overlay.ew-cloudy .ew-tint { opacity: calc(var(--ew-strength) * 0.16); }
+#easy-weather-overlay.ew-overcast .ew-tint { opacity: calc(var(--ew-strength) * 0.22); }
+#easy-weather-overlay.ew-rain-light .ew-tint { opacity: calc(var(--ew-strength) * 0.22); }
+#easy-weather-overlay.ew-rain .ew-tint { opacity: calc(var(--ew-strength) * 0.3); }
+#easy-weather-overlay.ew-storm .ew-tint { opacity: calc(var(--ew-strength) * 0.42); }
+#easy-weather-overlay.ew-snow .ew-tint { background: #a8ccea; opacity: calc(var(--ew-strength) * 0.16); }
+#easy-weather-overlay.ew-hail .ew-tint { background: #8fb4d2; opacity: calc(var(--ew-strength) * 0.24); }
+#easy-weather-overlay.ew-blizzard .ew-tint { background: #cfe3f2; opacity: calc(var(--ew-strength) * 0.34); }
+#easy-weather-overlay.ew-fog .ew-tint { background: #b9c2cc; opacity: calc(var(--ew-strength) * 0.24); }
+#easy-weather-overlay.ew-heat .ew-tint { background: #ff9b3d; opacity: calc(var(--ew-strength) * 0.18); }
+#easy-weather-overlay.ew-sandstorm .ew-tint { background: #d9ae6a; opacity: calc(var(--ew-strength) * 0.36); }
 
-/* Drifting cloud shadows -------------------- */
+/* Drifting cloud shadows --------------------- */
 #easy-weather-overlay .ew-clouds {
   background:
-    radial-gradient(42% 32% at 18% 22%, rgba(255, 255, 255, 0.5), transparent 70%),
-    radial-gradient(38% 30% at 62% 14%, rgba(255, 255, 255, 0.42), transparent 70%),
-    radial-gradient(48% 36% at 84% 46%, rgba(255, 255, 255, 0.38), transparent 70%),
-    radial-gradient(40% 30% at 38% 68%, rgba(255, 255, 255, 0.34), transparent 70%);
-  filter: blur(26px);
+    radial-gradient(42% 34% at 18% 22%, rgba(255, 255, 255, 0.55), transparent 72%),
+    radial-gradient(38% 30% at 62% 12%, rgba(255, 255, 255, 0.45), transparent 72%),
+    radial-gradient(50% 38% at 86% 48%, rgba(255, 255, 255, 0.4), transparent 72%),
+    radial-gradient(44% 32% at 36% 72%, rgba(255, 255, 255, 0.36), transparent 72%),
+    radial-gradient(36% 28% at 8% 88%, rgba(255, 255, 255, 0.3), transparent 72%);
+  filter: blur(42px);
   mix-blend-mode: soft-light;
-  animation: ew-drift calc(var(--ew-speed) * 6) linear infinite;
+  animation: ew-drift calc(var(--ew-speed) * 7) ease-in-out infinite;
 }
 
-#easy-weather-overlay.ew-partly-cloudy .ew-clouds { opacity: calc(var(--ew-strength) * 0.5); }
-#easy-weather-overlay.ew-cloudy .ew-clouds { opacity: calc(var(--ew-strength) * 0.8); }
+#easy-weather-overlay.ew-partly-cloudy .ew-clouds { opacity: calc(var(--ew-strength) * 0.45); }
+#easy-weather-overlay.ew-windy .ew-clouds,
+#easy-weather-overlay.ew-leaves .ew-clouds { opacity: calc(var(--ew-strength) * 0.4); }
+#easy-weather-overlay.ew-cloudy .ew-clouds { opacity: calc(var(--ew-strength) * 0.75); }
 #easy-weather-overlay.ew-overcast .ew-clouds,
 #easy-weather-overlay.ew-rain-light .ew-clouds,
 #easy-weather-overlay.ew-rain .ew-clouds,
-#easy-weather-overlay.ew-storm .ew-clouds,
 #easy-weather-overlay.ew-snow .ew-clouds,
-#easy-weather-overlay.ew-hail .ew-clouds { opacity: calc(var(--ew-strength) * 1); }
+#easy-weather-overlay.ew-hail .ew-clouds { opacity: calc(var(--ew-strength) * 0.95); }
+#easy-weather-overlay.ew-storm .ew-clouds,
+#easy-weather-overlay.ew-blizzard .ew-clouds { opacity: calc(var(--ew-strength) * 1.1); }
 
 @keyframes ew-drift {
-  0% { transform: translate3d(-6%, 0, 0); }
-  50% { transform: translate3d(6%, 2%, 0); }
-  100% { transform: translate3d(-6%, 0, 0); }
+  0% { transform: translate3d(-5%, 0, 0) scale(1.05); }
+  50% { transform: translate3d(5%, 2%, 0) scale(1.12); }
+  100% { transform: translate3d(-5%, 0, 0) scale(1.05); }
 }
 
-/* Precipitation and haze -------------------- */
-#easy-weather-overlay .ew-haze { background-repeat: repeat; }
-
-#easy-weather-overlay.ew-rain-light .ew-haze,
-#easy-weather-overlay.ew-rain .ew-haze,
-#easy-weather-overlay.ew-storm .ew-haze {
-  background-image: repeating-linear-gradient(
-    102deg,
-    rgba(190, 220, 255, 0) 0px,
-    rgba(190, 220, 255, 0) 3px,
-    rgba(190, 220, 255, 0.55) 3px,
-    rgba(190, 220, 255, 0) 5px
-  );
-  background-size: 100px 180px;
-  animation: ew-rainfall 0.65s linear infinite;
-}
-
-#easy-weather-overlay.ew-rain-light .ew-haze { opacity: calc(var(--ew-strength) * 0.3); animation-duration: 1s; }
-#easy-weather-overlay.ew-rain .ew-haze { opacity: calc(var(--ew-strength) * 0.5); }
-#easy-weather-overlay.ew-storm .ew-haze { opacity: calc(var(--ew-strength) * 0.7); animation-duration: 0.42s; }
-
-@keyframes ew-rainfall {
-  from { background-position: 0 0; }
-  to { background-position: -40px 180px; }
-}
-
-#easy-weather-overlay.ew-snow .ew-haze,
-#easy-weather-overlay.ew-blizzard .ew-haze,
-#easy-weather-overlay.ew-hail .ew-haze {
-  background-image:
-    radial-gradient(2.5px 2.5px at 20px 30px, rgba(255, 255, 255, 0.95), transparent),
-    radial-gradient(2px 2px at 110px 80px, rgba(255, 255, 255, 0.85), transparent),
-    radial-gradient(3px 3px at 180px 150px, rgba(255, 255, 255, 0.9), transparent),
-    radial-gradient(2px 2px at 70px 200px, rgba(255, 255, 255, 0.8), transparent),
-    radial-gradient(2.5px 2.5px at 240px 60px, rgba(255, 255, 255, 0.85), transparent);
-  background-size: 300px 300px;
-  animation: ew-snowfall 11s linear infinite;
-}
-
-#easy-weather-overlay.ew-snow .ew-haze { opacity: calc(var(--ew-strength) * 0.8); }
-#easy-weather-overlay.ew-hail .ew-haze { opacity: calc(var(--ew-strength) * 0.7); animation-duration: 2.6s; }
-#easy-weather-overlay.ew-blizzard .ew-haze { opacity: calc(var(--ew-strength) * 1); animation-duration: 2.2s; }
-
-@keyframes ew-snowfall {
-  from { background-position: 0 0, 0 0, 0 0, 0 0, 0 0; }
-  to { background-position: -60px 300px, 40px 300px, -20px 300px, 70px 300px, -45px 300px; }
-}
-
-#easy-weather-overlay.ew-fog .ew-haze,
-#easy-weather-overlay.ew-sandstorm .ew-haze {
+/* Haze that hangs in the air ----------------- */
+#easy-weather-overlay .ew-haze {
   background:
-    radial-gradient(60% 40% at 25% 60%, rgba(255, 255, 255, 0.75), transparent 70%),
-    radial-gradient(55% 38% at 75% 40%, rgba(255, 255, 255, 0.65), transparent 70%),
-    radial-gradient(70% 50% at 50% 85%, rgba(255, 255, 255, 0.6), transparent 70%);
-  filter: blur(18px);
-  animation: ew-drift calc(var(--ew-speed) * 4) linear infinite;
+    radial-gradient(62% 42% at 24% 62%, rgba(255, 255, 255, 0.8), transparent 74%),
+    radial-gradient(56% 38% at 76% 42%, rgba(255, 255, 255, 0.7), transparent 74%),
+    radial-gradient(74% 52% at 50% 88%, rgba(255, 255, 255, 0.62), transparent 74%);
+  filter: blur(54px);
+  animation: ew-drift calc(var(--ew-speed) * 5) ease-in-out infinite reverse;
 }
 
-#easy-weather-overlay.ew-fog .ew-haze { opacity: calc(var(--ew-strength) * 0.75); }
-#easy-weather-overlay.ew-sandstorm .ew-haze { opacity: calc(var(--ew-strength) * 0.9); }
+#easy-weather-overlay.ew-fog .ew-haze { opacity: calc(var(--ew-strength) * 0.8); }
+#easy-weather-overlay.ew-blizzard .ew-haze { opacity: calc(var(--ew-strength) * 0.7); }
+#easy-weather-overlay.ew-sandstorm .ew-haze { opacity: calc(var(--ew-strength) * 0.85); }
+#easy-weather-overlay.ew-rain .ew-haze,
+#easy-weather-overlay.ew-snow .ew-haze { opacity: calc(var(--ew-strength) * 0.25); }
+#easy-weather-overlay.ew-storm .ew-haze { opacity: calc(var(--ew-strength) * 0.4); }
 
 #easy-weather-overlay.ew-heat .ew-haze {
-  background: repeating-linear-gradient(0deg, rgba(255, 190, 120, 0.22) 0px, transparent 3px, transparent 8px);
+  background: radial-gradient(80% 60% at 50% 100%, rgba(255, 190, 120, 0.9), transparent 70%);
   opacity: calc(var(--ew-strength) * 0.5);
-  animation: ew-shimmer 4s ease-in-out infinite;
+  animation: ew-breathe 7s ease-in-out infinite;
 }
 
-@keyframes ew-shimmer {
-  0%, 100% { transform: translateY(0) scaleY(1); }
-  50% { transform: translateY(-4px) scaleY(1.02); }
+@keyframes ew-breathe {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(0, -2%, 0) scale(1.06); }
 }
 
-#easy-weather-overlay.ew-windy .ew-haze,
-#easy-weather-overlay.ew-leaves .ew-haze {
-  background: repeating-linear-gradient(88deg, rgba(255, 255, 255, 0.18) 0px, transparent 2px, transparent 90px);
-  opacity: calc(var(--ew-strength) * 0.35);
-  animation: ew-gust calc(var(--ew-speed) / 2) linear infinite;
+/* A darker rim in rough weather -------------- */
+#easy-weather-overlay .ew-vignette {
+  inset: 0;
+  background: radial-gradient(120% 90% at 50% 45%, transparent 48%, rgba(0, 0, 0, 0.85) 100%);
 }
 
-@keyframes ew-gust {
-  from { background-position: 0 0; }
-  to { background-position: 400px 0; }
-}
+#easy-weather-overlay.ew-rain .ew-vignette { opacity: calc(var(--ew-strength) * 0.3); }
+#easy-weather-overlay.ew-storm .ew-vignette { opacity: calc(var(--ew-strength) * 0.6); }
+#easy-weather-overlay.ew-blizzard .ew-vignette { opacity: calc(var(--ew-strength) * 0.45); }
+#easy-weather-overlay.ew-sandstorm .ew-vignette { opacity: calc(var(--ew-strength) * 0.55); }
+#easy-weather-overlay.ew-fog .ew-vignette { opacity: calc(var(--ew-strength) * 0.35); }
 
-/* Lightning --------------------------------- */
-#easy-weather-overlay .ew-flash { background: #dbeaff; opacity: 0; }
+/* Lightning ---------------------------------- */
+#easy-weather-overlay .ew-flash { background: #dbeaff; opacity: 0; transition: none; }
 #easy-weather-overlay .ew-flash.ew-flashing { animation: ew-flash 900ms ease-out; }
 
 @keyframes ew-flash {
   0% { opacity: 0; }
-  6% { opacity: calc(var(--ew-strength) * 0.65); }
-  12% { opacity: 0.05; }
-  20% { opacity: calc(var(--ew-strength) * 0.45); }
+  6% { opacity: calc(var(--ew-strength) * 0.6); }
+  12% { opacity: 0.04; }
+  20% { opacity: calc(var(--ew-strength) * 0.4); }
   100% { opacity: 0; }
 }
 

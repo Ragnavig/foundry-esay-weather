@@ -1,6 +1,6 @@
 import { MODULE_ID, SETTINGS, loc, setSetting, setting } from "../const.mjs";
 import { CLIMATES, INTENSITIES, WEATHER_TYPES } from "../weather-data.mjs";
-import { currentMoment } from "../calendar.mjs";
+import { currentMoment, weatherSeasonOf } from "../calendar.mjs";
 import {
   activeClimate, announceWeather, currentWeather, describeWeather, isMuted, muteEffect, rollAndSetWeather, setWeather
 } from "../weather.mjs";
@@ -56,7 +56,7 @@ export class WeatherApp extends HandlebarsApplicationMixin(ApplicationV2) {
       weather,
       moment,
       isGM: game.user.isGM,
-      seasonName: loc(moment.components.season?.name ?? ""),
+      seasonName: moment.seasonName,
       types: Object.values(WEATHER_TYPES).map(type => ({
         ...type,
         name: loc(type.label),
@@ -105,7 +105,7 @@ export class WeatherApp extends HandlebarsApplicationMixin(ApplicationV2) {
    * @returns {object[]}
    */
   #outlook(moment) {
-    const table = activeClimate().table[moment.components.season?.id] ?? {};
+    const table = activeClimate().table[weatherSeasonOf(moment.components)] ?? {};
     const total = Object.values(table).reduce((sum, weight) => sum + weight, 0) || 1;
     return Object.entries(table)
       .map(([id, weight]) => ({

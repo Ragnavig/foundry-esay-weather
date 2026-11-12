@@ -30,16 +30,22 @@ let ambientSound = null;
  */
 function overlayElement() {
   if ( overlay?.isConnected ) return overlay;
-  const parent = document.getElementById("interface") ?? document.body;
-  if ( !parent ) return null;
+
   overlay = document.createElement("div");
   overlay.id = "easy-weather-overlay";
   overlay.innerHTML = `
     <div class="ew-layer ew-tint"></div>
     <div class="ew-layer ew-clouds"></div>
     <div class="ew-layer ew-haze"></div>
+    <div class="ew-layer ew-vignette"></div>
     <div class="ew-layer ew-flash"></div>`;
-  parent.appendChild(overlay);
+
+  // Sitting directly after the canvas keeps the overlay above the map and below every piece of interface, whatever
+  // a given Foundry version calls its containers.
+  const board = document.getElementById("board");
+  if ( board?.parentElement ) board.after(overlay);
+  else (document.getElementById("interface") ?? document.body).appendChild(overlay);
+
   return overlay;
 }
 
@@ -243,9 +249,12 @@ export function applyDarkness(weather) {
     const scene = canvas.scene;
     if ( !scene ) return;
     const target = Math.round(darknessFor(weather) * 100) / 100;
-    if ( Math.abs((scene.environment?.darknessLevel ?? 0) - target) < 0.02 ) return;
+    const current = scene.environment?.darknessLevel ?? scene.darkness ?? 0;
+    if ( Math.abs(current - target) < 0.02 ) return;
+
+    const key = ("environment" in scene) ? "environment.darknessLevel" : "darkness";
     try {
-      await scene.update({ "environment.darknessLevel": target }, { animateDarkness: 2000 });
+      await scene.update({ [key]: target }, { animateDarkness: 1500 });
     } catch(err) {
       logError("Failed to update the scene darkness", err);
     }

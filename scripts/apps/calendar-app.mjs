@@ -1,7 +1,7 @@
 import { MODULE_ID, SETTINGS, formDataClass, loc, setSetting, setting } from "../const.mjs";
 import {
   activeCalendar, componentsOf, currentMoment, dateFromDayIndex, dayIndexFromDate, daysInMonth, isLeapYear,
-  moonPhases, noteKey, seasonOf
+  moonPhases, noteKey, seasonForDate
 } from "../calendar.mjs";
 import { setDate } from "../time.mjs";
 import { CalendarEditor } from "./calendar-editor.mjs";
@@ -74,7 +74,7 @@ export class CalendarApp extends HandlebarsApplicationMixin(ApplicationV2) {
     for ( let index = 0; index < leading; index++ ) days.push({ blank: true });
     for ( let day = 0; day < monthLength; day++ ) {
       const dayIndex = firstIndex + day;
-      const season = seasonOf(view.month, day, calendar);
+      const season = seasonForDate(view.year, view.month, day, calendar);
       days.push({
         blank: false,
         day: day + 1,
@@ -89,7 +89,7 @@ export class CalendarApp extends HandlebarsApplicationMixin(ApplicationV2) {
     }
 
     const selectedDate = dateFromDayIndex(selected, calendar);
-    const selectedSeason = seasonOf(selectedDate.month, selectedDate.day, calendar);
+    const selectedSeason = seasonForDate(selectedDate.year, selectedDate.month, selectedDate.day, calendar);
 
     return {
       calendar,

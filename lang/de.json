@@ -164,5 +164,18 @@
   "EASYWEATHER.Settings.TimeFormat.Name": "Zeitformat",
   "EASYWEATHER.Settings.TimeFormat.Hint": "Wie die Uhr auf deinem Bildschirm angezeigt wird.",
   "EASYWEATHER.Settings.TimeFormat.TwentyFour": "24 Stunden",
-  "EASYWEATHER.Settings.TimeFormat.Twelve": "12 Stunden (AM/PM)"
+  "EASYWEATHER.Settings.TimeFormat.Twelve": "12 Stunden (AM/PM)",
+  "EASYWEATHER.Calendar.Foundry": "Weltkalender",
+  "EASYWEATHER.Settings.CalendarSource.Name": "Kalender",
+  "EASYWEATHER.Settings.CalendarSource.Hint": "Woher das Datum kommt. Foundrys eigener Weltkalender ist der, den die Spielleitung in der Welt einstellt; der eigene Kalender dieses Moduls wird im Kalender-Editor bearbeitet.",
+  "EASYWEATHER.Settings.CalendarSource.Foundry": "Foundrys Weltkalender",
+  "EASYWEATHER.Settings.CalendarSource.Custom": "Eigener Kalender dieses Moduls",
+  "EASYWEATHER.Editor.FoundryMode": "Diese Welt folgt Foundrys Kalender",
+  "EASYWEATHER.Editor.FoundryModeHint": "Monate, Wochentage, Jahreszeiten und die Länge eines Tages kommen aus dem Weltkalender — das Datum hier ist also genau das eingestellte Weltdatum. Nur Monde und Tageslicht gehören diesem Modul.",
+  "EASYWEATHER.Editor.UseOwn": "Eigenen Kalender verwenden",
+  "EASYWEATHER.Editor.CustomMode": "Diese Welt nutzt einen eigenen Kalender",
+  "EASYWEATHER.Editor.CustomModeHint": "Der Kalender unten gehört diesem Modul. Foundrys Weltkalender wird währenddessen ignoriert.",
+  "EASYWEATHER.Editor.UseFoundry": "Zurück zu Foundrys Kalender",
+  "EASYWEATHER.Editor.Daylight": "Tageslicht",
+  "EASYWEATHER.Editor.DaylightHint": "Wie lang ein Tag in der Jahresmitte ist und wie weit die Jahreszeiten ihn auseinanderziehen. Daraus ergeben sich Sonnenauf- und -untergang sowie die Helligkeit, die der Tageszeit folgt."
 }

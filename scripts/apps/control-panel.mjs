@@ -95,7 +95,7 @@ export class ControlPanel {
       date: moment.date,
       clock: moment.clock,
       season: moment.components.season,
-      seasonName: loc(moment.components.season?.name ?? ""),
+      seasonName: moment.seasonName,
       moon: moment.moons[0] ?? null,
       isGM: canControlTime(),
       reverse: this.#reverse,

@@ -1,5 +1,6 @@
 import { MODULE_ID, SETTINGS } from "./const.mjs";
 import { CLIMATES, DEFAULT_WEATHER } from "./weather-data.mjs";
+import { resetCalendarCache } from "./calendar.mjs";
 import { clonePreset } from "./presets.mjs";
 
 /**
@@ -35,6 +36,25 @@ export function registerSettings() {
     type: Object,
     default: clonePreset("gregorian"),
     onChange: () => {
+      resetCalendarCache();
+      refreshInterface();
+      Hooks.callAll("easyWeather.calendarChanged");
+    }
+  });
+
+  register(SETTINGS.calendarSource, {
+    scope: "world",
+    config: true,
+    name: "EASYWEATHER.Settings.CalendarSource.Name",
+    hint: "EASYWEATHER.Settings.CalendarSource.Hint",
+    type: String,
+    default: "foundry",
+    choices: {
+      foundry: "EASYWEATHER.Settings.CalendarSource.Foundry",
+      custom: "EASYWEATHER.Settings.CalendarSource.Custom"
+    },
+    onChange: () => {
+      resetCalendarCache();
       refreshInterface();
       Hooks.callAll("easyWeather.calendarChanged");
     }
@@ -106,7 +126,7 @@ export function registerSettings() {
     name: "EASYWEATHER.Settings.Darkness.Name",
     hint: "EASYWEATHER.Settings.Darkness.Hint",
     type: Boolean,
-    default: false,
+    default: true,
     onChange: () => Hooks.callAll("easyWeather.weatherChanged")
   });
 

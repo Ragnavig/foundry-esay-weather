@@ -1,5 +1,30 @@
 <div class="ew-editor-body">
 
+  {{#if foundryMode}}
+  <section class="ew-card ew-banner">
+    <i class="fa-solid fa-circle-info"></i>
+    <div>
+      <strong>{{localize "EASYWEATHER.Editor.FoundryMode"}}</strong>
+      <p class="ew-muted">{{localize "EASYWEATHER.Editor.FoundryModeHint"}}</p>
+    </div>
+    <button type="button" class="ew-btn ew-ghost" data-action="useOwn">
+      <i class="fa-solid fa-code-branch"></i> {{localize "EASYWEATHER.Editor.UseOwn"}}
+    </button>
+  </section>
+  {{else}}
+  <section class="ew-card ew-banner">
+    <i class="fa-solid fa-circle-info"></i>
+    <div>
+      <strong>{{localize "EASYWEATHER.Editor.CustomMode"}}</strong>
+      <p class="ew-muted">{{localize "EASYWEATHER.Editor.CustomModeHint"}}</p>
+    </div>
+    <button type="button" class="ew-btn ew-ghost" data-action="useFoundry">
+      <i class="fa-solid fa-rotate-left"></i> {{localize "EASYWEATHER.Editor.UseFoundry"}}
+    </button>
+  </section>
+  {{/if}}
+
+  {{#unless foundryMode}}
   <section class="ew-card">
     <h3 class="ew-section">{{localize "EASYWEATHER.Editor.Basics"}}</h3>
     <div class="ew-grid-2">
@@ -130,6 +155,24 @@
     </div>
     <p class="ew-muted ew-hint">{{localize "EASYWEATHER.Editor.SeasonHint"}}</p>
   </section>
+  {{/unless}}
+
+  {{#if foundryMode}}
+  <section class="ew-card">
+    <h3 class="ew-section">{{localize "EASYWEATHER.Editor.Daylight"}}</h3>
+    <div class="ew-grid-2">
+      <label class="ew-field">
+        <span>{{localize "EASYWEATHER.Editor.DaylightBase"}}</span>
+        <input type="number" name="daylight.base" step="0.5" value="{{calendar.daylight.base}}">
+      </label>
+      <label class="ew-field">
+        <span>{{localize "EASYWEATHER.Editor.DaylightVariation"}}</span>
+        <input type="number" name="daylight.variation" step="0.5" value="{{calendar.daylight.variation}}">
+      </label>
+    </div>
+    <p class="ew-muted ew-hint">{{localize "EASYWEATHER.Editor.DaylightHint"}}</p>
+  </section>
+  {{/if}}
 
   <section class="ew-card">
     <div class="ew-notes-head">

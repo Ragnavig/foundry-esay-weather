@@ -1,5 +1,5 @@
-import { MODULE_ID, SETTINGS, formDataClass, loc, logError, setSetting } from "../const.mjs";
-import { activeCalendar } from "../calendar.mjs";
+import { MODULE_ID, SETTINGS, formDataClass, loc, logError, setSetting, setting } from "../const.mjs";
+import { activeCalendar, resetCalendarCache, usesFoundryCalendar } from "../calendar.mjs";
 import { CALENDAR_PRESETS, clonePreset } from "../presets.mjs";
 
 const { ApplicationV2, DialogV2, HandlebarsApplicationMixin } = foundry.applications.api;
@@ -35,7 +35,9 @@ export class CalendarEditor extends HandlebarsApplicationMixin(ApplicationV2) {
       addRow: CalendarEditor.#onAddRow,
       removeRow: CalendarEditor.#onRemoveRow,
       loadPreset: CalendarEditor.#onLoadPreset,
-      reset: CalendarEditor.#onReset
+      reset: CalendarEditor.#onReset,
+      useOwn: CalendarEditor.#onUseOwn,
+      useFoundry: CalendarEditor.#onUseFoundry
     }
   };
 
@@ -64,6 +66,7 @@ export class CalendarEditor extends HandlebarsApplicationMixin(ApplicationV2) {
     const calendar = this.draft;
     return {
       calendar,
+      foundryMode: usesFoundryCalendar(),
       presets: Object.values(CALENDAR_PRESETS).map(preset => ({ id: preset.id, name: loc(preset.name) })),
       seasonIcons: ["fa-seedling", "fa-sun", "fa-leaf", "fa-snowflake", "fa-cloud", "fa-fire"],
       buttons: [
@@ -236,6 +239,34 @@ export class CalendarEditor extends HandlebarsApplicationMixin(ApplicationV2) {
     this.render(false);
   }
 
+  /**
+   * Take Foundry's calendar over into this module's own, and switch to it.
+   * @this {CalendarEditor}
+   */
+  static async #onUseOwn() {
+    if ( !game.user.isGM ) return;
+    const copy = foundry.utils.deepClone(activeCalendar());
+    delete copy.fc;
+    copy.source = "custom";
+    await setSetting(SETTINGS.calendar, copy);
+    await setSetting(SETTINGS.calendarSource, "custom");
+    resetCalendarCache();
+    this.#draft = null;
+    this.render(false);
+  }
+
+  /**
+   * Hand the calendar back to Foundry.
+   * @this {CalendarEditor}
+   */
+  static async #onUseFoundry() {
+    if ( !game.user.isGM ) return;
+    await setSetting(SETTINGS.calendarSource, "foundry");
+    resetCalendarCache();
+    this.#draft = null;
+    this.render(false);
+  }
+
   /* -------------------------------------------- */
 
   /**
@@ -249,7 +280,16 @@ export class CalendarEditor extends HandlebarsApplicationMixin(ApplicationV2) {
     if ( !game.user.isGM ) return;
     const data = foundry.utils.expandObject(formData.object);
     const calendar = CalendarEditor.#normalise(data, this.draft);
-    await setSetting(SETTINGS.calendar, calendar);
+
+    // While the world follows Foundry's calendar, only the parts Foundry does not describe are this module's to keep.
+    if ( usesFoundryCalendar() ) {
+      const stored = foundry.utils.deepClone(setting(SETTINGS.calendar) ?? {});
+      stored.moons = calendar.moons;
+      stored.daylight = calendar.daylight;
+      await setSetting(SETTINGS.calendar, stored);
+    } else {
+      await setSetting(SETTINGS.calendar, calendar);
+    }
     ui.notifications?.info(loc("EASYWEATHER.Notify.CalendarSaved"));
   }
 }

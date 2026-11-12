@@ -1,6 +1,6 @@
 import { MODULE_ID, SETTINGS, clamp, loc, logError, setSetting, setting, weightedPick } from "./const.mjs";
 import { CLIMATES, DEFAULT_WEATHER, INTENSITIES, WEATHER_TYPES, WIND_LEVELS } from "./weather-data.mjs";
-import { currentMoment } from "./calendar.mjs";
+import { currentMoment, weatherSeasonOf } from "./calendar.mjs";
 import { applyWeather } from "./effects.mjs";
 
 /**
@@ -83,8 +83,7 @@ export function formatTemperature(celsius) {
  */
 export function rollWeather({ moment=currentMoment(), climate=activeClimate().id, previous=currentWeather() }={}) {
   const table = (CLIMATES[climate] ?? CLIMATES.temperate).table;
-  const seasonId = moment.components.season?.id ?? "spring";
-  const weights = table[seasonId] ?? table.spring ?? {};
+  const weights = table[weatherSeasonOf(moment.components)] ?? table.spring ?? {};
 
   // Weather rarely flips from a clear sky to a blizzard overnight, so yesterday's type and anything close to it on
   // the cloud scale get a little more weight.

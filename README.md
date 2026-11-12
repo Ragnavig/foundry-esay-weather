@@ -21,12 +21,16 @@ Built for **Foundry VTT v13 and v14**, system-agnostic.
 - Everything runs on Foundry's own `game.time.worldTime`, so other modules keep working.
 
 ### Calendar
+- **Uses Foundry's own world calendar** (`game.time.calendar`) by default, so the date shown is the date the world is
+  set to — months, weekdays, seasons, leap years and the length of a day all come from there. A world that needs
+  something it cannot express switches to this module's own calendar in one click.
 - A month at a glance, with the season colouring every day, the day's moon phase and a marker on days that carry a note.
 - **Travel to this day** moves the world clock to the day you picked, keeping the time of day.
 - **Notes per day** for festivals, deadlines and whatever the table needs to remember.
-- A full **calendar editor**: months (with leap-year lengths), weekdays, seasons, moons, how many hours a day has and
-  how long the days are in summer. Four presets are included — Earth, Harptos (Forgotten Realms),
-  Golarion (Pathfinder) and a plain 12 × 30 calendar.
+- A full **calendar editor** for worlds using their own calendar: months (with leap-year lengths), weekdays, seasons,
+  moons, how many hours a day has and how long the days are in summer. Four presets are included — Earth, Harptos
+  (Forgotten Realms), Golarion (Pathfinder) and a plain 12 × 30 calendar. While the world follows Foundry's calendar
+  the editor only holds the two things Foundry does not describe: moons and daylight.
 
 ### Weather
 - **15 weather types** from clear skies to thunderstorms, blizzards and sandstorms.
@@ -35,13 +39,14 @@ Built for **Foundry VTT v13 and v14**, system-agnostic.
 - **Rolls itself when a new day begins**, or on demand with one click.
 - Every visible part can be switched off on its own, at any time: **particles, overlay, lightning, ambience** — or all
   of them at once.
-- Optional: the scene's **darkness level follows the time of day** and the cloud cover.
+- The scene's **darkness level follows the time of day** and the cloud cover — move the clock and the map gets
+  brighter or darker with it. Can be switched off in the settings.
 - Optional: a small **chat card** announces each change of weather.
 
 ### What you see
 - Foundry's own particle effects (rain, snow, fog, leaves …) on the current scene or on every scene.
-- A canvas overlay this module draws on top: tint, drifting clouds, rain streaks, snowfall, haze, heat shimmer — with
-  a strength slider, per client.
+- A canvas overlay this module draws on top: tint, drifting cloud shadows, haze and a darker rim in rough weather.
+  Only soft, blurred shapes — nothing tiled, so it never reads as a pattern over the map. Strength slider per client.
 - Lightning flashes during a thunderstorm.
 
 ---
@@ -81,8 +86,8 @@ The calendar and the weather window are also in the scene controls, under the no
 
 ## Settings
 
-**World** — climate, roll on a new day, announce in chat, where particle effects are applied, scene darkness follows
-the day, show the panel to players.
+**World** — calendar source (Foundry's or this module's own), climate, roll on a new day, announce in chat, where
+particle effects are applied, scene darkness follows the day, show the panel to players.
 
 **Per client** — overlay on/off, overlay strength, lightning, ambience, temperature unit (°C/°F), 12- or 24-hour clock.
 

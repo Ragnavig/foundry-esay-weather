@@ -164,5 +164,18 @@
   "EASYWEATHER.Settings.TimeFormat.Name": "Time format",
   "EASYWEATHER.Settings.TimeFormat.Hint": "How the clock is shown on your screen.",
   "EASYWEATHER.Settings.TimeFormat.TwentyFour": "24 hours",
-  "EASYWEATHER.Settings.TimeFormat.Twelve": "12 hours (AM/PM)"
+  "EASYWEATHER.Settings.TimeFormat.Twelve": "12 hours (AM/PM)",
+  "EASYWEATHER.Calendar.Foundry": "World calendar",
+  "EASYWEATHER.Settings.CalendarSource.Name": "Calendar",
+  "EASYWEATHER.Settings.CalendarSource.Hint": "Where the date comes from. Foundry's own world calendar is the one the GM sets in the world; this module's own calendar is edited in the calendar editor.",
+  "EASYWEATHER.Settings.CalendarSource.Foundry": "Foundry's world calendar",
+  "EASYWEATHER.Settings.CalendarSource.Custom": "This module's own calendar",
+  "EASYWEATHER.Editor.FoundryMode": "This world follows Foundry's calendar",
+  "EASYWEATHER.Editor.FoundryModeHint": "Months, weekdays, seasons and the length of a day come from the world calendar, so the date here is the date the world is set to. Only moons and daylight belong to this module.",
+  "EASYWEATHER.Editor.UseOwn": "Use an own calendar",
+  "EASYWEATHER.Editor.CustomMode": "This world uses its own calendar",
+  "EASYWEATHER.Editor.CustomModeHint": "The calendar below is this module's own. Foundry's world calendar is ignored while this is on.",
+  "EASYWEATHER.Editor.UseFoundry": "Back to Foundry's calendar",
+  "EASYWEATHER.Editor.Daylight": "Daylight",
+  "EASYWEATHER.Editor.DaylightHint": "How long a day is in the middle of the year, and how far the seasons pull it apart. This drives sunrise, sunset and the darkness that follows the day."
 }

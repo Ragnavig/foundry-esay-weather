@@ -2,6 +2,21 @@
 
 All notable changes to this module are documented here.
 
+## 0.0.3
+
+- **The date now comes from Foundry's own world calendar.** Months, weekdays, seasons, leap years and the length of a
+  day are read from `game.time.calendar`, and every conversion is handed to it, so the module shows the date the
+  world is actually set to. A world can still switch to a calendar of its own in the editor or the settings.
+- The canvas overlay no longer draws tiled rain, snow or wind patterns, which looked like scan lines over the map.
+  It is now soft tint, drifting cloud shadows, haze and a vignette; precipitation comes from Foundry's particle
+  layer, which does it properly.
+- The overlay is mounted directly above the canvas, so it can never cover a window.
+- Scene darkness following the time of day is on by default, and works on scenes that still use the old
+  `darkness` field.
+- Buttons in the weather and calendar windows no longer collapse or overlap: Foundry's fixed button height is
+  undone where this module stacks an icon above a label.
+- Weather tables work with any season names a calendar uses, not only the four shipped ones.
+
 ## 0.0.2
 
 - Switching a weather layer off on your own screen and then back on in the weather window shows it again instead of

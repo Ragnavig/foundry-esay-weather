@@ -55,6 +55,8 @@ Hooks.once("init", () => {
 /* -------------------------------------------- */
 
 Hooks.once("ready", async () => {
+  // Foundry's own calendar only exists from here on, so anything built during init has to be thrown away.
+  Calendar.resetCalendarCache();
   Time.primeDayTracking();
   Weather.refreshWeather();
   await ControlPanel.instance.render();
@@ -85,6 +87,7 @@ Hooks.on("easyWeather.weatherChanged", () => {
 });
 
 Hooks.on("easyWeather.calendarChanged", () => {
+  Calendar.resetCalendarCache();
   Time.primeDayTracking();
   ControlPanel.instance.render();
 });

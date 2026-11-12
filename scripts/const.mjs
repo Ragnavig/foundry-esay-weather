@@ -11,6 +11,7 @@ export const TEMPLATES = `modules/${MODULE_ID}/templates`;
 /** Keys of every setting this module stores. */
 export const SETTINGS = {
   calendar: "calendar",
+  calendarSource: "calendarSource",
   weather: "weather",
   notes: "notes",
   climate: "climate",
