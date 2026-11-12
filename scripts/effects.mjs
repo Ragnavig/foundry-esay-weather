@@ -9,6 +9,10 @@ import { currentMoment } from "./calendar.mjs";
  * - the scene's own particle effect, which only a GM can set because it lives on the scene document,
  * - a canvas overlay this client draws for tint, cloud cover and haze,
  * - the darkness level of the scene, which follows the time of day and the cloud cover.
+ *
+ * The clouds and the haze belong to the map, not to the screen: they sit in a layer that carries the canvas's own
+ * transform, so they pan and zoom with the terrain and a cloud stays over the same hill. Tint, vignette and
+ * lightning stay in screen space, because a wash of colour over the whole view is what they are.
  */
 
 /* -------------------------------------------- */
@@ -21,6 +25,13 @@ let lightningTimer = null;
 
 /** @type {Sound|null} */
 let ambientSound = null;
+
+/**
+ * The cloud layer is drawn at a fraction of the map's size and scaled back up. A blur costs the square of its
+ * radius, so blurring a quarter-sized layer and magnifying it is far cheaper than blurring the whole map.
+ * @type {number}
+ */
+const MAP_LAYER_SCALE = 4;
 
 /* -------------------------------------------- */
 
@@ -35,8 +46,10 @@ function overlayElement() {
   overlay.id = "easy-weather-overlay";
   overlay.innerHTML = `
     <div class="ew-layer ew-tint"></div>
-    <div class="ew-layer ew-clouds"></div>
-    <div class="ew-layer ew-haze"></div>
+    <div class="ew-map">
+      <div class="ew-layer ew-clouds"></div>
+      <div class="ew-layer ew-haze"></div>
+    </div>
     <div class="ew-layer ew-vignette"></div>
     <div class="ew-layer ew-flash"></div>`;
 
@@ -46,7 +59,33 @@ function overlayElement() {
   if ( board?.parentElement ) board.after(overlay);
   else (document.getElementById("interface") ?? document.body).appendChild(overlay);
 
+  alignToMap();
   return overlay;
+}
+
+/* -------------------------------------------- */
+
+/**
+ * Put the map layer over the scene and give it the canvas's own transform, so it moves with the terrain.
+ */
+export function alignToMap() {
+  const layer = overlay?.querySelector(".ew-map");
+  if ( !layer ) return;
+
+  const rect = canvas?.dimensions?.sceneRect ?? canvas?.dimensions?.rect;
+  const matrix = canvas?.stage?.worldTransform;
+  if ( !rect || !matrix ) {
+    // Without a canvas there is no map to follow; the layer then simply covers the view.
+    layer.style.width = "100%";
+    layer.style.height = "100%";
+    layer.style.transform = "none";
+    return;
+  }
+
+  layer.style.width = `${rect.width / MAP_LAYER_SCALE}px`;
+  layer.style.height = `${rect.height / MAP_LAYER_SCALE}px`;
+  layer.style.transform = `matrix(${matrix.a}, ${matrix.b}, ${matrix.c}, ${matrix.d}, ${matrix.tx}, ${matrix.ty})`
+    + ` translate(${rect.x}px, ${rect.y}px) scale(${MAP_LAYER_SCALE})`;
 }
 
 /* -------------------------------------------- */
@@ -56,6 +95,10 @@ function overlayElement() {
  * @param {object} weather  Weather state to apply.
  */
 export function applyWeather(weather) {
+  // Underground there is no sky: the whole visible side of the weather is held back, and the world keeps its state
+  // so that stepping back outside picks it up again.
+  if ( setting(SETTINGS.dungeonMode, false) ) weather = { ...weather, enabled: false };
+
   applyOverlay(weather);
   applyLightning(weather);
   applyAmbientSound(weather);
@@ -76,6 +119,7 @@ export function applyWeather(weather) {
 export function applyOverlay(weather) {
   const element = overlayElement();
   if ( !element ) return;
+  alignToMap();
 
   const on = (weather.enabled !== false) && setting(SETTINGS.overlay, true) && !weather.muted?.overlay;
   element.className = on ? `ew-${WEATHER_TYPES[weather.type]?.overlay ?? "clear"}` : "ew-off";
@@ -239,7 +283,8 @@ export function darknessFor(weather, moment=currentMoment()) {
  * @param {object} weather  Weather state to read.
  */
 export function applyDarkness(weather) {
-  if ( !setting(SETTINGS.darkness, false) ) return;
+  if ( setting(SETTINGS.dungeonMode, false) ) return;
+  if ( !setting(SETTINGS.darkness, true) ) return;
   if ( !canvas?.scene ) return;
   if ( darknessTimer ) window.clearTimeout(darknessTimer);
 

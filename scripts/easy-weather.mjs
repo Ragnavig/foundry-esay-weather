@@ -101,6 +101,10 @@ Hooks.on("canvasReady", () => {
   ControlPanel.instance.render();
 });
 
+// The clouds belong to the map, so they have to follow every pan and every zoom.
+Hooks.on("canvasPan", () => Effects.alignToMap());
+Hooks.on("canvasTearDown", () => Effects.alignToMap());
+
 /* -------------------------------------------- */
 /*  Scene controls                              */
 /* -------------------------------------------- */

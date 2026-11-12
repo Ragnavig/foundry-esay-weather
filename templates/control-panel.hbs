@@ -4,6 +4,7 @@
     <i class="ew-season fa-solid {{moment.components.season.icon}}" style="color: {{moment.components.season.color}}"
        data-tooltip="{{seasonName}}"></i>
     <span class="ew-date">{{date}}</span>
+    {{#if dungeon}}<i class="ew-dungeon-mark fa-solid fa-dungeon" data-tooltip="{{localize 'EASYWEATHER.Panel.DungeonOn'}}"></i>{{/if}}
     <button type="button" class="ew-icon ew-collapse" data-action="collapse"
             data-tooltip="{{localize 'EASYWEATHER.Panel.Collapse'}}">
       <i class="fa-solid fa-chevron-up"></i>
@@ -47,6 +48,10 @@
       </button>
       {{/each}}
       <span class="ew-spacer"></span>
+      <button type="button" class="ew-icon ew-dungeon-toggle {{#if dungeon}}active{{/if}}" data-action="dungeon"
+              data-tooltip="{{localize 'EASYWEATHER.Panel.Dungeon'}}">
+        <i class="fa-solid fa-dungeon"></i>
+      </button>
       <button type="button" class="ew-icon" data-action="roll" data-tooltip="{{localize 'EASYWEATHER.Panel.Roll'}}">
         <i class="fa-solid fa-dice-d20"></i>
       </button>

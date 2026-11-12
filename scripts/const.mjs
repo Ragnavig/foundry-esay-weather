@@ -23,9 +23,11 @@ export const SETTINGS = {
   lightning: "lightning",
   sound: "sound",
   darkness: "darkness",
+  dungeonMode: "dungeonMode",
   temperatureUnit: "temperatureUnit",
   timeFormat: "timeFormat",
   playerPanel: "playerPanel",
+  panelFade: "panelFade",
   panelPosition: "panelPosition",
   panelCollapsed: "panelCollapsed"
 };

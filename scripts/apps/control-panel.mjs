@@ -61,6 +61,8 @@ export class ControlPanel {
       const element = this.#ensureElement();
       element.innerHTML = html;
       element.classList.toggle("ew-collapsed", Boolean(setting(SETTINGS.panelCollapsed, false)));
+      element.classList.toggle("ew-fade", Boolean(setting(SETTINGS.panelFade, true)));
+      element.classList.toggle("ew-dungeon", Boolean(setting(SETTINGS.dungeonMode, false)));
       this.#activateListeners(element);
       this.#applyPosition(element);
     } catch(err) {
@@ -99,6 +101,7 @@ export class ControlPanel {
       moon: moment.moons[0] ?? null,
       isGM: canControlTime(),
       reverse: this.#reverse,
+      dungeon: Boolean(setting(SETTINGS.dungeonMode, false)),
       steps: quickSteps().map(step => ({ ...step, label: loc(step.label) })),
       jumps: [
         { id: "sunrise", icon: "fa-mountain-sun", label: loc("EASYWEATHER.Jump.Sunrise") },
@@ -190,6 +193,11 @@ export class ControlPanel {
         break;
       case "roll":
         await rollAndSetWeather();
+        break;
+      case "dungeon":
+        if ( !game.user.isGM ) return;
+        await setSetting(SETTINGS.dungeonMode, !setting(SETTINGS.dungeonMode, false));
+        await this.render();
         break;
       case "collapse":
         await setSetting(SETTINGS.panelCollapsed, !setting(SETTINGS.panelCollapsed, false));

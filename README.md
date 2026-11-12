@@ -43,10 +43,17 @@ Built for **Foundry VTT v13 and v14**, system-agnostic.
   brighter or darker with it. Can be switched off in the settings.
 - Optional: a small **chat card** announces each change of weather.
 
+### Dungeon mode
+One button on the panel, for when the party goes underground: no visible weather, the scene darkness stops following
+the day, and no weather is rolled at the start of a new day. The world keeps its weather, so stepping back outside
+picks it up where it left off.
+
 ### What you see
 - Foundry's own particle effects (rain, snow, fog, leaves …) on the current scene or on every scene.
-- A canvas overlay this module draws on top: tint, drifting cloud shadows, haze and a darker rim in rough weather.
-  Only soft, blurred shapes — nothing tiled, so it never reads as a pattern over the map. Strength slider per client.
+- A canvas overlay this module draws on top. The **cloud shadows and the haze belong to the map**: they carry the
+  canvas's own transform, so a cloud stays over the same hill while you pan and zoom. Tint, vignette and lightning
+  stay in screen space. Only soft, blurred shapes — nothing tiled, so it never reads as a pattern over the map.
+  Strength slider per client.
 - Lightning flashes during a thunderstorm.
 
 ---
@@ -81,15 +88,17 @@ The calendar and the weather window are also in the scene controls, under the no
 | Turn everything off | Weather window → *Effects on/off* |
 | Roll new weather now | The die button on the panel |
 | Edit the calendar | Calendar → ✎ |
+| Go underground | The dungeon button on the panel |
 
 ---
 
 ## Settings
 
 **World** — calendar source (Foundry's or this module's own), climate, roll on a new day, announce in chat, where
-particle effects are applied, scene darkness follows the day, show the panel to players.
+particle effects are applied, scene darkness follows the day, dungeon mode, show the panel to players.
 
-**Per client** — overlay on/off, overlay strength, lightning, ambience, temperature unit (°C/°F), 12- or 24-hour clock.
+**Per client** — overlay on/off, overlay strength, lightning, ambience, fade the panel when the mouse is elsewhere,
+temperature unit (°C/°F), 12- or 24-hour clock.
 
 ---
 

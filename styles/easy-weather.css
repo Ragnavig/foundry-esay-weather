@@ -28,7 +28,12 @@
   pointer-events: auto;
 }
 
-#easy-weather-panel.ew-dragging { opacity: 0.85; }
+#easy-weather-panel .ew-panel-inner { transition: opacity 260ms ease, box-shadow 260ms ease; }
+#easy-weather-panel.ew-fade .ew-panel-inner { opacity: 0.28; }
+#easy-weather-panel.ew-fade:hover .ew-panel-inner,
+#easy-weather-panel.ew-fade:focus-within .ew-panel-inner,
+#easy-weather-panel.ew-fade.ew-dragging .ew-panel-inner { opacity: 1; }
+#easy-weather-panel.ew-dragging .ew-panel-inner { box-shadow: 0 18px 44px rgba(0, 0, 0, 0.6); }
 
 #easy-weather-panel .ew-panel-inner {
   background: var(--ew-bg);
@@ -119,6 +124,9 @@
 #easy-weather-panel .ew-sign { opacity: 0.55; margin-right: 1px; }
 #easy-weather-panel .ew-spacer { flex: 1; }
 #easy-weather-panel .ew-moon { font-size: 15px; margin-left: auto; }
+#easy-weather-panel .ew-dungeon-mark { font-size: 11px; color: #d2a24c; }
+#easy-weather-panel.ew-dungeon .ew-weather-chip { opacity: 0.55; }
+.easy-weather .ew-icon.ew-dungeon-toggle.active { background: #d2a24c; color: #1a1205; }
 
 .easy-weather .ew-icon {
   display: inline-flex;
@@ -152,10 +160,12 @@
 }
 
 /*
- * Foundry gives every button a fixed height and a row layout of its own. The panels here stack an icon above a label,
- * so those defaults have to be undone before anything else is styled, or the label lands on top of the icon.
+ * Foundry gives every button a fixed height and a row layout of its own. The panels here stack an icon above a
+ * label, so those defaults have to be undone — but only inside this module's own panels. `:where()` keeps the
+ * selector at zero specificity, so the window frame's own close and control buttons keep Foundry's styling and
+ * every rule below still wins over this one.
  */
-.easy-weather button {
+:where(#easy-weather-panel, .ew-weather-app, .ew-calendar-app, .ew-editor-body, .ew-editor-footer) button {
   height: auto;
   min-height: 0;
   min-width: 0;
@@ -167,7 +177,7 @@
   flex: 0 0 auto;
 }
 
-.easy-weather button > i { margin: 0; }
+:where(#easy-weather-panel, .ew-weather-app, .ew-calendar-app, .ew-editor-body) button > i { margin: 0; }
 .easy-weather button:disabled { cursor: default; }
 
 .easy-weather .ew-section {
@@ -503,6 +513,19 @@
   contain: strict;
 }
 
+/*
+ * Everything inside `.ew-map` is drawn in the scene's own coordinates and then carries the canvas transform, so a
+ * cloud stays over the same patch of ground while the view is panned or zoomed. It is drawn at a quarter size and
+ * magnified, because a blur costs the square of its radius.
+ */
+#easy-weather-overlay .ew-map {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  will-change: transform;
+}
+
 #easy-weather-overlay .ew-layer {
   position: absolute;
   inset: -20%;
@@ -539,7 +562,7 @@
     radial-gradient(50% 38% at 86% 48%, rgba(255, 255, 255, 0.4), transparent 72%),
     radial-gradient(44% 32% at 36% 72%, rgba(255, 255, 255, 0.36), transparent 72%),
     radial-gradient(36% 28% at 8% 88%, rgba(255, 255, 255, 0.3), transparent 72%);
-  filter: blur(42px);
+  filter: blur(11px);
   mix-blend-mode: soft-light;
   animation: ew-drift calc(var(--ew-speed) * 7) ease-in-out infinite;
 }
@@ -568,7 +591,7 @@
     radial-gradient(62% 42% at 24% 62%, rgba(255, 255, 255, 0.8), transparent 74%),
     radial-gradient(56% 38% at 76% 42%, rgba(255, 255, 255, 0.7), transparent 74%),
     radial-gradient(74% 52% at 50% 88%, rgba(255, 255, 255, 0.62), transparent 74%);
-  filter: blur(54px);
+  filter: blur(14px);
   animation: ew-drift calc(var(--ew-speed) * 5) ease-in-out infinite reverse;
 }
 

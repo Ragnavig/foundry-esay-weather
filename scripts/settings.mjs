@@ -130,6 +130,14 @@ export function registerSettings() {
     onChange: () => Hooks.callAll("easyWeather.weatherChanged")
   });
 
+  world(SETTINGS.dungeonMode, {
+    name: "EASYWEATHER.Settings.DungeonMode.Name",
+    hint: "EASYWEATHER.Settings.DungeonMode.Hint",
+    type: Boolean,
+    default: false,
+    onChange: () => Hooks.callAll("easyWeather.weatherChanged")
+  });
+
   world(SETTINGS.playerPanel, {
     name: "EASYWEATHER.Settings.PlayerPanel.Name",
     hint: "EASYWEATHER.Settings.PlayerPanel.Hint",
@@ -174,6 +182,14 @@ export function registerSettings() {
     type: Boolean,
     default: false,
     onChange: () => Hooks.callAll("easyWeather.weatherChanged")
+  });
+
+  client(SETTINGS.panelFade, {
+    name: "EASYWEATHER.Settings.PanelFade.Name",
+    hint: "EASYWEATHER.Settings.PanelFade.Hint",
+    type: Boolean,
+    default: true,
+    onChange: () => Hooks.callAll("easyWeather.panelVisibilityChanged")
   });
 
   client(SETTINGS.temperatureUnit, {

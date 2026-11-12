@@ -69,6 +69,33 @@ function seasonLook(name, index) {
 }
 
 /**
+ * How far Foundry's own display of a year sits from the raw `year` of its components.
+ *
+ * `TimeComponents#year` counts the years elapsed since the calendar's year zero, while the world shows the year the
+ * calendar actually names. Rather than guess which way `yearZero` is applied, the offset is read back out of
+ * Foundry's own formatted timestamp, so the module always prints the same year the world does.
+ *
+ * @param {CalendarData} fc  Foundry's calendar.
+ * @param {object} config    Its configuration.
+ * @returns {number}
+ */
+function yearOffsetOf(fc, config) {
+  const zero = Number(config.years?.yearZero) || 0;
+  if ( !zero ) return 0;
+  try {
+    const time = game.time.worldTime;
+    const year = fc.timeToComponents(time).year;
+    const printed = String(fc.format(time, "timestamp"));
+    for ( const offset of [zero, -zero, 0] ) {
+      if ( printed.includes(String(year + offset)) ) return offset;
+    }
+  } catch(err) {
+    // The formatter is optional; the plain offset is still the better guess than none.
+  }
+  return zero;
+}
+
+/**
  * Turn Foundry's world calendar into the shape the rest of this module works with.
  * @returns {object|null}  The calendar, or `null` if Foundry's calendar cannot be read.
  */
@@ -106,6 +133,7 @@ function fromFoundryCalendar() {
   return {
     source: "foundry",
     fc,
+    yearOffset: yearOffsetOf(fc, config),
     name: localize(config.name) || loc("EASYWEATHER.Calendar.Foundry"),
     time: {
       secondsPerMinute: days.secondsPerMinute ?? 60,
@@ -161,7 +189,7 @@ export function secondsPerDay(calendar) {
 export function isLeapYear(calendar, year) {
   if ( calendar.fc ) {
     try {
-      return Boolean(calendar.fc.isLeapYear(year));
+      return Boolean(calendar.fc.isLeapYear(year - (calendar.yearOffset ?? 0)));
     } catch(err) {
       return false;
     }
@@ -217,7 +245,7 @@ export function componentsOf(worldTime, calendar=activeCalendar()) {
     const c = calendar.fc.timeToComponents(worldTime);
     const weekdayIndex = c.dayOfWeek ?? 0;
     return {
-      year: c.year,
+      year: c.year + (calendar.yearOffset ?? 0),
       month: c.month ?? 0,
       day: c.dayOfMonth ?? 0,
       hour: c.hour ?? 0,
@@ -304,7 +332,7 @@ export function dateFromDayIndex(dayIndex, calendar) {
 export function worldTimeFromDate(date, calendar=activeCalendar()) {
   if ( calendar.fc ) {
     return calendar.fc.componentsToTime({
-      year: date.year,
+      year: date.year - (calendar.yearOffset ?? 0),
       month: date.month ?? 0,
       dayOfMonth: date.day ?? 0,
       hour: date.hour ?? 0,

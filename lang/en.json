@@ -177,5 +177,11 @@
   "EASYWEATHER.Editor.CustomModeHint": "The calendar below is this module's own. Foundry's world calendar is ignored while this is on.",
   "EASYWEATHER.Editor.UseFoundry": "Back to Foundry's calendar",
   "EASYWEATHER.Editor.Daylight": "Daylight",
-  "EASYWEATHER.Editor.DaylightHint": "How long a day is in the middle of the year, and how far the seasons pull it apart. This drives sunrise, sunset and the darkness that follows the day."
+  "EASYWEATHER.Editor.DaylightHint": "How long a day is in the middle of the year, and how far the seasons pull it apart. This drives sunrise, sunset and the darkness that follows the day.",
+  "EASYWEATHER.Panel.Dungeon": "Dungeon mode",
+  "EASYWEATHER.Panel.DungeonOn": "Dungeon mode is on: no sky, no day/night lighting, no weather rolls.",
+  "EASYWEATHER.Settings.DungeonMode.Name": "Dungeon mode",
+  "EASYWEATHER.Settings.DungeonMode.Hint": "Underground there is no sky. Holds back the visible weather, stops the scene darkness from following the day, and skips the weather roll at the start of a new day. The world keeps its weather, so stepping back outside picks it up again.",
+  "EASYWEATHER.Settings.PanelFade.Name": "Fade the panel when not pointed at",
+  "EASYWEATHER.Settings.PanelFade.Hint": "The panel sits quietly at low opacity and comes back to full as soon as the mouse is over it."
 }

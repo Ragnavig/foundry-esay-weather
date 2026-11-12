@@ -177,5 +177,11 @@
   "EASYWEATHER.Editor.CustomModeHint": "Der Kalender unten gehört diesem Modul. Foundrys Weltkalender wird währenddessen ignoriert.",
   "EASYWEATHER.Editor.UseFoundry": "Zurück zu Foundrys Kalender",
   "EASYWEATHER.Editor.Daylight": "Tageslicht",
-  "EASYWEATHER.Editor.DaylightHint": "Wie lang ein Tag in der Jahresmitte ist und wie weit die Jahreszeiten ihn auseinanderziehen. Daraus ergeben sich Sonnenauf- und -untergang sowie die Helligkeit, die der Tageszeit folgt."
+  "EASYWEATHER.Editor.DaylightHint": "Wie lang ein Tag in der Jahresmitte ist und wie weit die Jahreszeiten ihn auseinanderziehen. Daraus ergeben sich Sonnenauf- und -untergang sowie die Helligkeit, die der Tageszeit folgt.",
+  "EASYWEATHER.Panel.Dungeon": "Dungeon-Modus",
+  "EASYWEATHER.Panel.DungeonOn": "Dungeon-Modus ist an: kein Himmel, keine Tag-/Nacht-Beleuchtung, keine Wetterwürfe.",
+  "EASYWEATHER.Settings.DungeonMode.Name": "Dungeon-Modus",
+  "EASYWEATHER.Settings.DungeonMode.Hint": "Unter der Erde gibt es keinen Himmel. Hält das sichtbare Wetter zurück, lässt die Szenendunkelheit nicht mehr der Tageszeit folgen und überspringt den Wetterwurf zum Tagesbeginn. Das Wetter der Welt bleibt erhalten und gilt wieder, sobald es nach draußen geht.",
+  "EASYWEATHER.Settings.PanelFade.Name": "Panel ausblenden, wenn die Maus nicht darauf ist",
+  "EASYWEATHER.Settings.PanelFade.Hint": "Das Panel liegt dezent im Hintergrund und wird wieder voll sichtbar, sobald die Maus darüber ist."
 }

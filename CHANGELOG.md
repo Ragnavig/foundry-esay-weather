@@ -2,6 +2,20 @@
 
 All notable changes to this module are documented here.
 
+## 0.0.4
+
+- **The year is the year the world shows.** Foundry's components count years from the calendar's year zero, while
+  the world names the year itself. The offset is now read back out of Foundry's own formatted timestamp, so the
+  panel can no longer print a different year than the world does.
+- **Clouds belong to the map.** The cloud shadows and the haze now carry the canvas transform: they pan and zoom
+  with the terrain instead of sitting still in front of the screen. They are drawn at a quarter size and magnified,
+  so the blur stays cheap on large maps.
+- **Dungeon mode**: one button on the panel holds back the visible weather, stops the scene darkness from following
+  the day and skips the weather roll at the start of a new day. The world keeps its weather for when the party comes
+  back up.
+- The panel rests at low opacity and comes back to full as soon as the mouse is over it. Can be switched off.
+- The button reset no longer reaches the window frame, so the close and control icons look like Foundry's again.
+
 ## 0.0.3
 
 - **The date now comes from Foundry's own world calendar.** Months, weekdays, seasons, leap years and the length of a
