@@ -2,6 +2,14 @@
 
 All notable changes to this module are documented here.
 
+## 0.0.6
+
+- **Hide the system's own clock.** A new per-client setting takes the clock a game system keeps at the top of the
+  screen out of view — the D&D 5e calendar bar, for one — so this panel is the only one. Nothing is written to the
+  system's settings; the bar is only hidden on your screen.
+- The panel's starting position is measured from the controls down the left-hand side instead of being a fixed
+  guess, so it no longer lands under them.
+
 ## 0.0.5
 
 - **Every date in the calendar was wrong.** `CalendarData#componentsToTime` reads the day of the *year* and ignores

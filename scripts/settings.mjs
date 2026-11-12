@@ -192,6 +192,14 @@ export function registerSettings() {
     onChange: () => Hooks.callAll("easyWeather.panelVisibilityChanged")
   });
 
+  client(SETTINGS.hideSystemClock, {
+    name: "EASYWEATHER.Settings.HideSystemClock.Name",
+    hint: "EASYWEATHER.Settings.HideSystemClock.Hint",
+    type: Boolean,
+    default: false,
+    onChange: () => Hooks.callAll("easyWeather.panelVisibilityChanged")
+  });
+
   client(SETTINGS.temperatureUnit, {
     name: "EASYWEATHER.Settings.TemperatureUnit.Name",
     hint: "EASYWEATHER.Settings.TemperatureUnit.Hint",

@@ -100,7 +100,10 @@ The calendar and the weather window are also in the scene controls, under the no
 particle effects are applied, scene darkness follows the day, dungeon mode, show the panel to players.
 
 **Per client** — overlay on/off, overlay strength, lightning, ambience, fade the panel when the mouse is elsewhere,
-temperature unit (°C/°F), 12- or 24-hour clock.
+hide the system's own clock, temperature unit (°C/°F), 12- or 24-hour clock.
+
+If your system brings its own clock — the D&D 5e calendar bar at the top of the screen, for example — turn on
+*Hide the system's own clock* and this panel takes over. The system's own setting is left untouched.
 
 ---
 

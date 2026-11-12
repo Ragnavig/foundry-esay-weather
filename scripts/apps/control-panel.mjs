@@ -28,6 +28,14 @@ export class ControlPanel {
   /* -------------------------------------------- */
 
   /**
+   * Hide or restore the clock the game system keeps at the top of the screen, so the two do not sit on top of each
+   * other. Nothing is written to the system's own settings; the bar is only taken out of view on this client.
+   */
+  static applySystemClockVisibility() {
+    document.body?.classList.toggle("ew-hide-system-clock", Boolean(setting(SETTINGS.hideSystemClock, false)));
+  }
+
+  /**
    * The panel of this client, created on first use.
    * @returns {ControlPanel}
    */
@@ -52,6 +60,7 @@ export class ControlPanel {
    * @returns {Promise<void>}
    */
   async render() {
+    ControlPanel.applySystemClockVisibility();
     if ( !ControlPanel.visible ) return this.close();
     if ( this.#rendering ) return;
     this.#rendering = true;
@@ -131,15 +140,32 @@ export class ControlPanel {
   /* -------------------------------------------- */
 
   /**
-   * Put the panel where this client last left it.
+   * Put the panel where this client last left it. Without a stored position it starts clear of whatever the system
+   * keeps at the top of the screen.
    * @param {HTMLElement} element  Panel element.
    */
   #applyPosition(element) {
     const stored = setting(SETTINGS.panelPosition, {}) ?? {};
     const top = clamp(Number(stored.top ?? 12), 0, Math.max(0, window.innerHeight - 60));
-    const left = clamp(Number(stored.left ?? 320), 0, Math.max(0, window.innerWidth - 120));
+    const left = clamp(Number(stored.left ?? ControlPanel.#defaultLeft()), 0, Math.max(0, window.innerWidth - 120));
     element.style.top = `${top}px`;
     element.style.left = `${left}px`;
+  }
+
+  /* -------------------------------------------- */
+
+  /**
+   * Where the panel starts out: clear of the bars the interface keeps down the left-hand side. The containers at
+   * the top of the screen are full-height flex columns, so only the controls themselves can be measured.
+   * @returns {number}
+   */
+  static #defaultLeft() {
+    let right = 90;
+    for ( const id of ["scene-controls", "scene-navigation"] ) {
+      const rect = document.getElementById(id)?.getBoundingClientRect();
+      if ( rect?.width ) right = Math.max(right, rect.right);
+    }
+    return Math.round(right + 12);
   }
 
   /* -------------------------------------------- */

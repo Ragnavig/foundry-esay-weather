@@ -185,5 +185,7 @@
   "EASYWEATHER.Settings.PanelFade.Name": "Fade the panel when not pointed at",
   "EASYWEATHER.Settings.PanelFade.Hint": "The panel sits quietly at low opacity and comes back to full as soon as the mouse is over it.",
   "EASYWEATHER.DateLineFestival": "{festival}, {year}",
-  "EASYWEATHER.CalendarApp.Festival": "Festival day"
+  "EASYWEATHER.CalendarApp.Festival": "Festival day",
+  "EASYWEATHER.Settings.HideSystemClock.Name": "Hide the system's own clock",
+  "EASYWEATHER.Settings.HideSystemClock.Hint": "Takes the clock the game system shows at the top of the screen out of view, so this panel is the only one. Only hidden on your screen; the system's own setting is left alone."
 }
