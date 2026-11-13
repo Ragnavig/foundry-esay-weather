@@ -1,19 +1,19 @@
 import { MODULE_ID, SETTINGS, clamp, isPrimaryGM, logError, setting } from "./const.mjs";
 import { INTENSITIES, WEATHER_TYPES } from "./weather-data.mjs";
 import { currentMoment } from "./calendar.mjs";
-import { applyCloudShadows, tearDownCloudShadows, usesCanvasClouds } from "./cloud-shadows.mjs";
+import { applyClouds, tearDownClouds, updateForView } from "./clouds.mjs";
+import { sceneWeatherView } from "./scene-kind.mjs";
 
 /**
  * Turns a weather state into something you can see.
  *
- * Three layers do the work, and each one can be silenced on its own:
- * - the scene's own particle effect, which only a GM can set because it lives on the scene document,
- * - a canvas overlay this client draws for tint, cloud cover and haze,
+ * Four things draw, and what each of them is worth comes from the scene itself — see {@link sceneWeatherView}:
+ * - Foundry's own particle effects, which only a GM can set because they live on the scene document,
+ * - the cloud deck and its ground shadows, drawn on the canvas (see `clouds.mjs`),
+ * - an overlay this client draws over the view for colour, haze and lightning,
  * - the darkness level of the scene, which follows the time of day and the cloud cover.
  *
- * The clouds and the haze belong to the map, not to the screen: they sit in a layer that carries the canvas's own
- * transform, so they pan and zoom with the terrain and a cloud stays over the same hill. Tint, vignette and
- * lightning stay in screen space, because a wash of colour over the whole view is what they are.
+ * Underground none of it applies; above the cloud deck the rain is hidden underneath and the colour wash eases off.
  */
 
 /* -------------------------------------------- */
@@ -26,13 +26,6 @@ let lightningTimer = null;
 
 /** @type {Sound|null} */
 let ambientSound = null;
-
-/**
- * The cloud layer is drawn at a fraction of the map's size and scaled back up. A blur costs the square of its
- * radius, so blurring a quarter-sized layer and magnifying it is far cheaper than blurring the whole map.
- * @type {number}
- */
-const MAP_LAYER_SCALE = 4;
 
 /* -------------------------------------------- */
 
@@ -47,10 +40,7 @@ function overlayElement() {
   overlay.id = "easy-weather-overlay";
   overlay.innerHTML = `
     <div class="ew-layer ew-tint"></div>
-    <div class="ew-map">
-      <div class="ew-layer ew-clouds"></div>
-      <div class="ew-layer ew-haze"></div>
-    </div>
+    <div class="ew-map"><div class="ew-layer ew-haze"></div></div>
     <div class="ew-layer ew-vignette"></div>
     <div class="ew-layer ew-flash"></div>`;
 
@@ -67,7 +57,7 @@ function overlayElement() {
 /* -------------------------------------------- */
 
 /**
- * Put the map layer over the scene and give it the canvas's own transform, so it moves with the terrain.
+ * Put the haze layer over the scene and give it the canvas's own transform, so it moves with the terrain.
  */
 export function alignToMap() {
   const layer = overlay?.querySelector(".ew-map");
@@ -76,17 +66,18 @@ export function alignToMap() {
   const rect = canvas?.dimensions?.sceneRect ?? canvas?.dimensions?.rect;
   const matrix = canvas?.stage?.worldTransform;
   if ( !rect || !matrix ) {
-    // Without a canvas there is no map to follow; the layer then simply covers the view.
     layer.style.width = "100%";
     layer.style.height = "100%";
     layer.style.transform = "none";
     return;
   }
 
-  layer.style.width = `${rect.width / MAP_LAYER_SCALE}px`;
-  layer.style.height = `${rect.height / MAP_LAYER_SCALE}px`;
+  // Drawn at a quarter size and magnified, because a blur costs the square of its radius.
+  const shrink = 4;
+  layer.style.width = `${rect.width / shrink}px`;
+  layer.style.height = `${rect.height / shrink}px`;
   layer.style.transform = `matrix(${matrix.a}, ${matrix.b}, ${matrix.c}, ${matrix.d}, ${matrix.tx}, ${matrix.ty})`
-    + ` translate(${rect.x}px, ${rect.y}px) scale(${MAP_LAYER_SCALE})`;
+    + ` translate(${rect.x}px, ${rect.y}px) scale(${shrink})`;
 }
 
 /* -------------------------------------------- */
@@ -96,17 +87,15 @@ export function alignToMap() {
  * @param {object} weather  Weather state to apply.
  */
 export function applyWeather(weather) {
-  // Underground there is no sky: the whole visible side of the weather is held back, and the world keeps its state
-  // so that stepping back outside picks it up again.
-  if ( setting(SETTINGS.dungeonMode, false) ) weather = { ...weather, enabled: false };
-
-  applyOverlay(weather);
-  applyCloudShadows(weather, currentMoment());
-  applyLightning(weather);
-  applyAmbientSound(weather);
+  const view = sceneWeatherView();
+  applyOverlay(weather, view);
+  applyClouds(weather, currentMoment());
+  applyLightning(weather, view);
+  applyAmbientSound(weather, view);
+  applyParticleStrength(view);
   if ( isPrimaryGM() ) {
-    applySceneParticles(weather);
-    applyDarkness(weather);
+    applySceneParticles(weather, view);
+    applyDarkness(weather, view);
   }
 }
 
@@ -115,23 +104,22 @@ export function applyWeather(weather) {
 /* -------------------------------------------- */
 
 /**
- * Draw the canvas overlay for a weather state.
+ * Draw the overlay for a weather state.
  * @param {object} weather  Weather state to draw.
+ * @param {object} [view]   What the scene makes of it.
  */
-export function applyOverlay(weather) {
+export function applyOverlay(weather, view=sceneWeatherView()) {
   const element = overlayElement();
   if ( !element ) return;
   alignToMap();
 
-  const on = (weather.enabled !== false) && setting(SETTINGS.overlay, true) && !weather.muted?.overlay;
+  const on = (weather.enabled !== false) && setting(SETTINGS.overlay, true) && !weather.muted?.overlay
+    && (view.overlay > 0);
   element.className = on ? `ew-${WEATHER_TYPES[weather.type]?.overlay ?? "clear"}` : "ew-off";
-
-  // The cloud shadows may be drawn on the canvas instead, in which case the overlay leaves them alone.
-  element.dataset.clouds = usesCanvasClouds() ? "canvas" : "off";
 
   const factor = INTENSITIES[weather.intensity]?.factor ?? 1;
   const strength = clamp(Number(setting(SETTINGS.overlayStrength, 70)) / 100, 0, 1);
-  element.style.setProperty("--ew-strength", String(on ? factor * strength : 0));
+  element.style.setProperty("--ew-strength", String(on ? factor * strength * view.overlay : 0));
   element.style.setProperty("--ew-wind", String(clamp(weather.wind ?? 0, 0, 5)));
   element.style.setProperty("--ew-speed", `${Math.max(2, 14 - ((weather.wind ?? 0) * 2))}s`);
 }
@@ -143,15 +131,16 @@ export function applyOverlay(weather) {
 /**
  * Start or stop the lightning flashes of a weather state.
  * @param {object} weather  Weather state to read.
+ * @param {object} [view]   What the scene makes of it.
  */
-export function applyLightning(weather) {
+export function applyLightning(weather, view=sceneWeatherView()) {
   if ( lightningTimer ) {
     window.clearTimeout(lightningTimer);
     lightningTimer = null;
   }
   const type = WEATHER_TYPES[weather.type];
   const on = type?.lightning && (weather.enabled !== false) && setting(SETTINGS.lightning, true)
-    && !weather.muted?.lightning && !weather.muted?.overlay;
+    && !weather.muted?.lightning && (view.lightning > 0);
   if ( !on ) return;
 
   const schedule = () => {
@@ -169,8 +158,7 @@ export function applyLightning(weather) {
  */
 export function flash() {
   const element = overlayElement();
-  if ( !element ) return;
-  const layer = element.querySelector(".ew-flash");
+  const layer = element?.querySelector(".ew-flash");
   if ( !layer ) return;
   layer.classList.remove("ew-flashing");
   // Forcing a reflow restarts the animation even when two flashes land close together.
@@ -185,10 +173,12 @@ export function flash() {
 /**
  * Play, swap or stop the ambient loop a weather state names.
  * @param {object} weather  Weather state to read.
+ * @param {object} [view]   What the scene makes of it.
  */
-function applyAmbientSound(weather) {
+function applyAmbientSound(weather, view=sceneWeatherView()) {
   const path = weather.sound;
-  const on = path && (weather.enabled !== false) && setting(SETTINGS.sound, false) && !weather.muted?.sound;
+  const on = path && (weather.enabled !== false) && setting(SETTINGS.sound, false) && !weather.muted?.sound
+    && !view.indoors;
   if ( !on ) {
     ambientSound?.stop();
     ambientSound = null;
@@ -204,7 +194,7 @@ function applyAmbientSound(weather) {
 }
 
 /* -------------------------------------------- */
-/*  Scene particles                             */
+/*  Precipitation                               */
 /* -------------------------------------------- */
 
 /**
@@ -218,11 +208,14 @@ export function availableSceneEffects() {
 /**
  * The particle effect key a weather type should use on this build, or `""` for none.
  * @param {object} weather  Weather state to read.
+ * @param {object} [view]   What the scene makes of it.
  * @returns {string}
  */
-export function sceneEffectFor(weather) {
+export function sceneEffectFor(weather, view=sceneWeatherView()) {
   if ( weather.enabled === false ) return "";
   if ( weather.muted?.particles ) return "";
+  if ( view.particles <= 0 ) return "";
+  if ( Number(setting(SETTINGS.precipitation, 100)) <= 0 ) return "";
   const available = availableSceneEffects();
   for ( const key of WEATHER_TYPES[weather.type]?.scene ?? [] ) {
     if ( available.includes(key) ) return key;
@@ -233,23 +226,46 @@ export function sceneEffectFor(weather) {
 /**
  * Write the particle effect of a weather state onto the scenes the GM chose. GM only.
  * @param {object} weather  Weather state to apply.
+ * @param {object} [view]   What the scene makes of it.
  * @returns {Promise<void>}
  */
-export async function applySceneParticles(weather) {
+export async function applySceneParticles(weather, view=sceneWeatherView()) {
   const mode = setting(SETTINGS.sceneEffects, "current");
   if ( mode === "off" ) return;
 
-  const target = sceneEffectFor(weather);
+  const target = sceneEffectFor(weather, view);
+  // Other scenes are judged on their own terms, since a dungeon should stay dry while it rains outside.
   const scenes = (mode === "all") ? game.scenes.contents : [canvas.scene].filter(Boolean);
   const updates = scenes
-    .filter(scene => (scene.weather ?? "") !== target)
-    .map(scene => ({ _id: scene.id, weather: target }));
+    .map(scene => ({ scene, want: (mode === "all") ? sceneEffectFor(weather, sceneWeatherView(scene)) : target }))
+    .filter(({ scene, want }) => (scene.weather ?? "") !== want)
+    .map(({ scene, want }) => ({ _id: scene.id, weather: want }));
   if ( !updates.length ) return;
 
   try {
     await Scene.implementation.updateDocuments(updates);
   } catch(err) {
     logError("Failed to update the scene weather", err);
+  }
+}
+
+/**
+ * Dim Foundry's own particles to the amount the table asked for, and to how far above them the camera is.
+ * @param {object} [view]  What the scene makes of the weather.
+ */
+export function applyParticleStrength(view=sceneWeatherView()) {
+  const layer = canvas?.weather;
+  if ( !layer ) return;
+  const amount = clamp(Number(setting(SETTINGS.precipitation, 100)) / 100, 0, 1);
+  const alpha = amount * view.particles;
+
+  try {
+    // `weatherEffects` is the container Foundry parents its particle effects to. Dimming that one container
+    // leaves the layer's mask, and the cloud sprites added beside it, untouched.
+    if ( layer.weatherEffects ) layer.weatherEffects.alpha = alpha;
+    else for ( const effect of layer.effects?.values?.() ?? [] ) effect.alpha = alpha;
+  } catch(err) {
+    logError("Failed to set the strength of the precipitation", err);
   }
 }
 
@@ -284,11 +300,12 @@ export function darknessFor(weather, moment=currentMoment()) {
 }
 
 /**
- * Follow the day with the scene's darkness level. GM only, and only when the setting is on.
+ * Follow the day with the scene's darkness level. GM only, and not underground.
  * @param {object} weather  Weather state to read.
+ * @param {object} [view]   What the scene makes of it.
  */
-export function applyDarkness(weather) {
-  if ( setting(SETTINGS.dungeonMode, false) ) return;
+export function applyDarkness(weather, view=sceneWeatherView()) {
+  if ( !view.darkness ) return;
   if ( !setting(SETTINGS.darkness, true) ) return;
   if ( !canvas?.scene ) return;
   if ( darknessTimer ) window.clearTimeout(darknessTimer);
@@ -313,10 +330,10 @@ export function applyDarkness(weather) {
 
 /* -------------------------------------------- */
 
-export { usesCanvasClouds };
+export { updateForView };
 
 /**
- * Remove everything this module draws on the screen. The canvas layer has a teardown of its own.
+ * Remove everything this module draws.
  */
 export function tearDownEffects() {
   if ( lightningTimer ) window.clearTimeout(lightningTimer);
@@ -325,7 +342,7 @@ export function tearDownEffects() {
   ambientSound = null;
   overlay?.remove();
   overlay = null;
-  tearDownCloudShadows();
+  tearDownClouds();
 }
 
 /** @type {string} */

@@ -23,6 +23,21 @@
     {{/if}}
   </div>
 
+  {{#if isGM}}
+  <h3 class="ew-section">{{localize "EASYWEATHER.WeatherApp.Scene"}}</h3>
+  <div class="ew-kinds">
+    {{#each scene.kinds}}
+    <button type="button" class="ew-kind {{#if active}}active{{/if}}" data-action="setKind" data-kind="{{id}}">
+      <i class="fa-solid {{icon}}"></i>
+      <span>{{name}}</span>
+    </button>
+    {{/each}}
+  </div>
+  <p class="ew-muted ew-hint">
+    {{localize "EASYWEATHER.WeatherApp.SceneHint" grid=scene.gridLabel kind=(localize (concat "EASYWEATHER.SceneKind." (ewCapitalize scene.detected)))}}
+  </p>
+  {{/if}}
+
   <h3 class="ew-section">{{localize "EASYWEATHER.WeatherApp.Effects"}}</h3>
   <div class="ew-toggles">
     {{#each toggles}}
@@ -36,8 +51,16 @@
   </div>
 
   <div class="ew-sliders">
+    {{#if isGM}}
+    {{#each dials}}
     <label class="ew-field">
-      <span>{{localize "EASYWEATHER.WeatherApp.OverlayStrength"}}</span>
+      <span>{{label}} <em>{{value}}%</em></span>
+      <input type="range" name="{{key}}" min="0" max="100" step="5" value="{{value}}">
+    </label>
+    {{/each}}
+    {{/if}}
+    <label class="ew-field">
+      <span>{{localize "EASYWEATHER.WeatherApp.OverlayStrength"}} <em>{{strength}}%</em></span>
       <input type="range" name="strength" min="0" max="100" step="5" value="{{strength}}">
     </label>
     {{#if isGM}}

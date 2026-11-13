@@ -14,7 +14,8 @@ Bug reports and pull requests are welcome.
 | `scripts/weather-data.mjs` | weather types, climates, season tables and intensities |
 | `scripts/weather.mjs` | rolling and storing the weather |
 | `scripts/effects.mjs` | everything you can see: particles, overlay, lightning, darkness |
-| `scripts/cloud-shadows.mjs` | the cloud deck and its shadows, drawn into Foundry's weather layer |
+| `scripts/scene-kind.mjs` | what kind of place a scene is, and what each layer is worth there |
+| `scripts/clouds.mjs` | the cloud deck and its shadows, drawn into Foundry's weather layer |
 | `scripts/apps/` | the control panel, the calendar, the editor and the weather window |
 | `templates/`, `styles/`, `lang/` | markup, stylesheet and translations |
 | `test/` | two dependency-free Node scripts that check the calendar maths |
@@ -26,6 +27,8 @@ Bug reports and pull requests are welcome.
 - **Foundry's calendar comes first.** Unless the world opted out, every conversion between a date and a world time
   goes through `game.time.calendar`, so this module can never disagree with the date the world is set to. Only
   moons and daylight, which Foundry's calendar does not describe, belong to this module in that mode.
+- **The scene decides, not a switch.** Anything that depends on where the viewer stands reads `sceneWeatherView()`
+  and multiplies by what it returns. No renderer asks "is this a dungeon" on its own.
 - **Nothing tiled over the canvas.** A repeating gradient reads as scan lines, not as weather. The overlay uses soft,
   blurred shapes only; particles are Foundry's job.
 - **Only one client writes.** The weather roll and every write to a scene happen on the primary GM, so two GMs

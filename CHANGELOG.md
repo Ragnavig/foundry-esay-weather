@@ -2,6 +2,26 @@
 
 All notable changes to this module are documented here.
 
+## 0.3.0
+
+**A scene now says what kind of place it is, and the weather follows from that.** Instead of switching layers on
+and off by hand, every scene is a dungeon, a battlemap or a region map, worked out from what one grid square
+covers and overridable per scene in the weather window.
+
+- **Dungeon** — no sky. No weather, no particles, and the day no longer moves the scene's darkness.
+- **Battlemap** — you stand under the cover. Shadows on the ground, rain coming down at you, the full colour wash.
+- **Region map** — you look down on the cloud deck. The clouds themselves are the picture, their shadows ease off,
+  and the rain is hidden underneath. Zoom in and the camera comes down through the deck: the shadows come back,
+  the rain starts, the colour wash returns. It is one continuous value, so nothing snaps.
+- Three dials, in the weather window and in the settings: **cloud density**, **cloud opacity** and
+  **precipitation**. Density really changes the sky — it decides how many clouds the texture is built from, so a
+  low setting leaves open sky between them rather than just fading everything.
+- The dungeon button on the panel now marks *this scene* as a dungeon, rather than turning the world's weather
+  off everywhere. A dungeon scene no longer stops the weather being rolled for the world outside.
+- The old screen-space cloud layer is gone. Clouds are drawn on the canvas and nowhere else.
+- Gone with it: the world-wide *Dungeon mode* and the *Clouds* renderer choice, both replaced by the scene's kind.
+
+## 0.2.0
 ## 0.2.0
 
 - **Clouds you look down on.** On a map where a grid square covers real ground, the cloud cover is now a deck of

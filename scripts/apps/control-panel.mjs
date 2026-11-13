@@ -2,6 +2,7 @@ import { MODULE_ID, SETTINGS, clamp, loc, logError, setSetting, setting } from "
 import { currentMoment } from "../calendar.mjs";
 import { advance, canControlTime, jumpTo, quickSteps } from "../time.mjs";
 import { currentWeather, describeWeather, rollAndSetWeather } from "../weather.mjs";
+import { sceneKind, setSceneKind, storedKind } from "../scene-kind.mjs";
 import { CalendarApp } from "./calendar-app.mjs";
 import { WeatherApp } from "./weather-app.mjs";
 
@@ -62,7 +63,7 @@ export class ControlPanel {
       element.innerHTML = html;
       element.classList.toggle("ew-collapsed", Boolean(setting(SETTINGS.panelCollapsed, false)));
       element.classList.toggle("ew-fade", Boolean(setting(SETTINGS.panelFade, true)));
-      element.classList.toggle("ew-dungeon", Boolean(setting(SETTINGS.dungeonMode, false)));
+      element.classList.toggle("ew-dungeon", sceneKind() === "dungeon");
       this.#activateListeners(element);
       this.#applyPosition(element);
     } catch(err) {
@@ -101,7 +102,7 @@ export class ControlPanel {
       moon: moment.moons[0] ?? null,
       isGM: canControlTime(),
       reverse: this.#reverse,
-      dungeon: Boolean(setting(SETTINGS.dungeonMode, false)),
+      dungeon: sceneKind() === "dungeon",
       steps: quickSteps().map(step => ({ ...step, label: loc(step.label) })),
       jumps: [
         { id: "sunrise", icon: "fa-mountain-sun", label: loc("EASYWEATHER.Jump.Sunrise") },
@@ -212,8 +213,9 @@ export class ControlPanel {
         await rollAndSetWeather();
         break;
       case "dungeon":
+        // One click takes this scene underground and the next hands it back to whatever it was.
         if ( !game.user.isGM ) return;
-        await setSetting(SETTINGS.dungeonMode, !setting(SETTINGS.dungeonMode, false));
+        await setSceneKind((storedKind() === "dungeon") ? "auto" : "dungeon");
         await this.render();
         break;
       case "collapse":

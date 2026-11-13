@@ -5,6 +5,7 @@ import {
   activeClimate, announceWeather, currentWeather, describeWeather, isMuted, muteEffect, rollAndSetWeather, setWeather
 } from "../weather.mjs";
 import { availableSceneEffects, flash, sceneEffectFor } from "../effects.mjs";
+import { SCENE_KINDS, detectedKind, gridMetresOf, sceneWeatherView, setSceneKind, storedKind } from "../scene-kind.mjs";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -34,7 +35,8 @@ export class WeatherApp extends HandlebarsApplicationMixin(ApplicationV2) {
       toggleAll: WeatherApp.#onToggleAll,
       roll: WeatherApp.#onRoll,
       announce: WeatherApp.#onAnnounce,
-      testFlash: WeatherApp.#onTestFlash
+      testFlash: WeatherApp.#onTestFlash,
+      setKind: WeatherApp.#onSetKind
     }
   };
 
@@ -50,7 +52,9 @@ export class WeatherApp extends HandlebarsApplicationMixin(ApplicationV2) {
     const weather = describeWeather(currentWeather());
     const moment = currentMoment();
     const available = availableSceneEffects();
-    const particles = sceneEffectFor(currentWeather());
+    const view = sceneWeatherView();
+    const particles = sceneEffectFor(currentWeather(), view);
+    const metres = gridMetresOf();
 
     return {
       weather,
@@ -71,13 +75,15 @@ export class WeatherApp extends HandlebarsApplicationMixin(ApplicationV2) {
       toggles: [
         {
           key: "particles", icon: "fa-snowflake", label: loc("EASYWEATHER.Toggle.Particles"),
-          on: !weather.muted?.particles, hint: particles ? `CONFIG.weatherEffects.${particles}` : loc("EASYWEATHER.Toggle.NoParticles"),
-          disabled: !game.user.isGM || (setting(SETTINGS.sceneEffects, "current") === "off")
+          on: !weather.muted?.particles && (view.particles > 0),
+          hint: particles ? `CONFIG.weatherEffects.${particles}` : loc("EASYWEATHER.Toggle.NoParticles"),
+          disabled: !game.user.isGM || (setting(SETTINGS.sceneEffects, "current") === "off") || (view.particles <= 0)
         },
         {
           key: "clouds", icon: "fa-cloud", label: loc("EASYWEATHER.Toggle.Clouds"),
-          on: !weather.muted?.clouds && (setting(SETTINGS.cloudMode, "auto") !== "off"),
-          hint: loc("EASYWEATHER.Toggle.CloudsHint"), disabled: !weather.type.cloud || !game.user.isGM
+          on: !weather.muted?.clouds && (view.deck + view.shadows > 0),
+          hint: loc("EASYWEATHER.Toggle.CloudsHint"),
+          disabled: !weather.type.cloud || !game.user.isGM || view.indoors
         },
         {
           key: "overlay", icon: "fa-brush", label: loc("EASYWEATHER.Toggle.Overlay"),
@@ -97,6 +103,24 @@ export class WeatherApp extends HandlebarsApplicationMixin(ApplicationV2) {
       climates: Object.values(CLIMATES).map(climate => ({
         ...climate, name: loc(climate.label), active: climate.id === activeClimate().id
       })),
+      view,
+      scene: {
+        name: canvas?.scene?.name ?? "",
+        stored: storedKind(),
+        detected: detectedKind(),
+        gridLabel: (metres >= 1000) ? `${Math.round(metres / 100) / 10} km` : `${Math.round(metres * 10) / 10} m`,
+        kinds: SCENE_KINDS.map(id => ({
+          id,
+          name: loc(`EASYWEATHER.SceneKind.${id.capitalize()}`),
+          icon: { auto: "fa-wand-magic-sparkles", dungeon: "fa-dungeon", battlemap: "fa-chess-board", region: "fa-map" }[id],
+          active: storedKind() === id
+        }))
+      },
+      dials: [
+        { key: "cloudDensity", label: loc("EASYWEATHER.Dial.CloudDensity"), value: Number(setting(SETTINGS.cloudDensity, 55)) },
+        { key: "cloudOpacity", label: loc("EASYWEATHER.Dial.CloudOpacity"), value: Number(setting(SETTINGS.cloudOpacity, 70)) },
+        { key: "precipitation", label: loc("EASYWEATHER.Dial.Precipitation"), value: Number(setting(SETTINGS.precipitation, 100)) }
+      ],
       strength: Number(setting(SETTINGS.overlayStrength, 70)),
       outlook: this.#outlook(moment)
     };
@@ -140,6 +164,13 @@ export class WeatherApp extends HandlebarsApplicationMixin(ApplicationV2) {
     this.element.querySelector("[name=strength]")?.addEventListener("change", async event => {
       await setSetting(SETTINGS.overlayStrength, Number(event.target.value));
     });
+
+    for ( const key of ["cloudDensity", "cloudOpacity", "precipitation"] ) {
+      this.element.querySelector(`[name=${key}]`)?.addEventListener("change", async event => {
+        await setSetting(SETTINGS[key], Number(event.target.value));
+        this.render(false);
+      });
+    }
 
     this.element.querySelector("[name=temperature]")?.addEventListener("change", async event => {
       await setWeather({ temperature: Number(event.target.value) }, { announce: false });
@@ -190,13 +221,9 @@ export class WeatherApp extends HandlebarsApplicationMixin(ApplicationV2) {
     // so a GM turning one off here turns it off for the world while a player only silences their own screen.
     const clientKey = { overlay: SETTINGS.overlay, lightning: SETTINGS.lightning, sound: SETTINGS.sound }[key];
 
-    // The cloud shadows are drawn by a renderer this client picks, so their own switch is a string rather than a
-    // flag. Turning them off here leaves a chosen renderer alone, so turning them on again restores it.
-    const cloudsOff = () => setting(SETTINGS.cloudMode, "auto") === "off";
-
     if ( !game.user.isGM ) {
-      if ( key === "clouds" ) return;   // the cloud mode belongs to the world, so a player cannot change it
-      else if ( clientKey ) await setSetting(clientKey, !setting(clientKey, key !== "sound"));
+      if ( key === "clouds" ) return;   // the clouds belong to the world, so a player cannot change them
+      if ( clientKey ) await setSetting(clientKey, !setting(clientKey, key !== "sound"));
       this.render(false);
       return;
     }
@@ -204,7 +231,6 @@ export class WeatherApp extends HandlebarsApplicationMixin(ApplicationV2) {
     const muted = isMuted(key);
     // Turning a layer back on should actually show it, even when this screen had switched it off earlier.
     if ( muted && clientKey ) await setSetting(clientKey, true);
-    if ( muted && (key === "clouds") && cloudsOff() ) await setSetting(SETTINGS.cloudMode, "auto");
     await muteEffect(key, !muted);
     this.render(false);
   }
@@ -234,6 +260,17 @@ export class WeatherApp extends HandlebarsApplicationMixin(ApplicationV2) {
    */
   static async #onAnnounce() {
     await announceWeather(currentWeather());
+  }
+
+  /**
+   * Say what kind of place this scene is.
+   * @this {WeatherApp}
+   * @param {PointerEvent} event  Click event.
+   * @param {HTMLElement} target  The button that was clicked.
+   */
+  static async #onSetKind(event, target) {
+    await setSceneKind(target.dataset.kind);
+    this.render(false);
   }
 
   /**

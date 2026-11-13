@@ -126,7 +126,6 @@ export async function onWorldTimeUpdate(worldTime) {
   // Only one client may roll, and only when the day actually moved forward.
   if ( !isPrimaryGM() ) return;
   if ( !setting(SETTINGS.autoRoll, true) ) return;
-  if ( setting(SETTINGS.dungeonMode, false) ) return;
   if ( dayIndex < previous ) return;
   await rollAndSetWeather({ moment });
 }

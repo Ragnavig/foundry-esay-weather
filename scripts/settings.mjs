@@ -130,14 +130,6 @@ export function registerSettings() {
     onChange: () => Hooks.callAll("easyWeather.weatherChanged")
   });
 
-  world(SETTINGS.dungeonMode, {
-    name: "EASYWEATHER.Settings.DungeonMode.Name",
-    hint: "EASYWEATHER.Settings.DungeonMode.Hint",
-    type: Boolean,
-    default: false,
-    onChange: () => Hooks.callAll("easyWeather.weatherChanged")
-  });
-
   world(SETTINGS.playerPanel, {
     name: "EASYWEATHER.Settings.PlayerPanel.Name",
     hint: "EASYWEATHER.Settings.PlayerPanel.Hint",
@@ -146,17 +138,27 @@ export function registerSettings() {
     onChange: () => Hooks.callAll("easyWeather.panelVisibilityChanged")
   });
 
-  world(SETTINGS.cloudMode, {
-    name: "EASYWEATHER.Settings.CloudMode.Name",
-    hint: "EASYWEATHER.Settings.CloudMode.Hint",
-    type: String,
-    default: "auto",
-    choices: {
-      auto: "EASYWEATHER.Settings.CloudMode.Auto",
-      deck: "EASYWEATHER.Settings.CloudMode.Deck",
-      shadows: "EASYWEATHER.Settings.CloudMode.Shadows",
-      off: "EASYWEATHER.Settings.CloudMode.Off"
-    },
+  world(SETTINGS.cloudDensity, {
+    name: "EASYWEATHER.Settings.CloudDensity.Name",
+    hint: "EASYWEATHER.Settings.CloudDensity.Hint",
+    type: new foundry.data.fields.NumberField({ min: 0, max: 100, step: 5, initial: 55, nullable: false }),
+    default: 55,
+    onChange: () => Hooks.callAll("easyWeather.weatherChanged")
+  });
+
+  world(SETTINGS.cloudOpacity, {
+    name: "EASYWEATHER.Settings.CloudOpacity.Name",
+    hint: "EASYWEATHER.Settings.CloudOpacity.Hint",
+    type: new foundry.data.fields.NumberField({ min: 0, max: 100, step: 5, initial: 70, nullable: false }),
+    default: 70,
+    onChange: () => Hooks.callAll("easyWeather.weatherChanged")
+  });
+
+  world(SETTINGS.precipitation, {
+    name: "EASYWEATHER.Settings.Precipitation.Name",
+    hint: "EASYWEATHER.Settings.Precipitation.Hint",
+    type: new foundry.data.fields.NumberField({ min: 0, max: 100, step: 5, initial: 100, nullable: false }),
+    default: 100,
     onChange: () => Hooks.callAll("easyWeather.weatherChanged")
   });
 

@@ -45,10 +45,21 @@ Built for **Foundry VTT v13 and v14**, system-agnostic.
   brighter or darker with it. Can be switched off in the settings.
 - Optional: a small **chat card** announces each change of weather.
 
-### Dungeon mode
-One button on the panel, for when the party goes underground: no visible weather, the scene darkness stops following
-the day, and no weather is rolled at the start of a new day. The world keeps its weather, so stepping back outside
-picks it up where it left off.
+### Every scene knows what it is
+Weather looks different depending on where you are standing, and that is a property of the map. Each scene is a
+**dungeon**, a **battlemap** or a **region map** — worked out from what one grid square covers, and overridable per
+scene in the weather window.
+
+| | Dungeon | Battlemap | Region map |
+| --- | --- | --- | --- |
+| Clouds overhead | — | — | a deck you look down on |
+| Shadows on the ground | — | yes | eased off under the deck |
+| Rain and snow | — | falling at you | hidden under the clouds |
+| Colour and haze | — | full | lighter |
+| Darkness follows the day | — | yes | yes |
+
+On a region map, zooming in brings the camera down through the deck — the clouds give way, the shadows come back
+and the rain starts. It is one continuous value, so nothing snaps from one state to the other.
 
 ### What you see
 - Foundry's own particle effects (rain, snow, fog, leaves …) on the current scene or on every scene.
@@ -93,14 +104,17 @@ The calendar and the weather window are also in the scene controls, under the no
 | Turn everything off | Weather window → *Effects on/off* |
 | Roll new weather now | The die button on the panel |
 | Edit the calendar | Calendar → ✎ |
-| Go underground | The dungeon button on the panel |
+| Mark a scene as a dungeon | The dungeon button on the panel |
+| Change what a scene counts as | Weather window → *This scene* |
+| Fewer, thinner or heavier clouds | Weather window → the three dials |
 
 ---
 
 ## Settings
 
 **World** — calendar source (Foundry's or this module's own), climate, roll on a new day, announce in chat, where
-particle effects are applied, scene darkness follows the day, dungeon mode, show the panel to players.
+particle effects are applied, scene darkness follows the day, show the panel to players, and the three dials:
+cloud density, cloud opacity and precipitation, plus the zoom at which you break through the clouds.
 
 **Per client** — overlay on/off, overlay strength, lightning, ambience, fade the panel when the mouse is elsewhere,
 temperature unit (°C/°F), 12- or 24-hour clock.

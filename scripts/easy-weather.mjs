@@ -4,7 +4,8 @@ import * as Calendar from "./calendar.mjs";
 import * as Time from "./time.mjs";
 import * as Weather from "./weather.mjs";
 import * as Effects from "./effects.mjs";
-import * as Clouds from "./cloud-shadows.mjs";
+import * as Clouds from "./clouds.mjs";
+import * as SceneKind from "./scene-kind.mjs";
 import { CALENDAR_PRESETS } from "./presets.mjs";
 import { CLIMATES, INTENSITIES, WEATHER_TYPES } from "./weather-data.mjs";
 import { ControlPanel } from "./apps/control-panel.mjs";
@@ -28,6 +29,8 @@ function registerHelpers() {
   Handlebars.registerHelper("ewAdd", (a, b) => Number(a) + Number(b));
   Handlebars.registerHelper("ewPad", value => String(value ?? 0).padStart(2, "0"));
   Handlebars.registerHelper("ewPercent", value => `${Math.round(Number(value) * 100)}%`);
+  Handlebars.registerHelper("ewCapitalize", value => String(value ?? "").capitalize());
+  Handlebars.registerHelper("concat", (...args) => args.slice(0, -1).join(""));
 }
 
 /* -------------------------------------------- */
@@ -44,6 +47,7 @@ Hooks.once("init", () => {
     weather: Weather,
     effects: Effects,
     clouds: Clouds,
+    scenes: SceneKind,
     data: { CALENDAR_PRESETS, CLIMATES, WEATHER_TYPES, INTENSITIES },
     apps: { CalendarApp, CalendarEditor, WeatherApp, ControlPanel },
     openCalendar: () => new CalendarApp().render({ force: true }),
@@ -109,9 +113,17 @@ Hooks.on("canvasPan", () => {
   Clouds.updateForView();
 });
 
+// A scene that is told what kind of place it is has to redraw, and so does one whose grid changed under it.
+Hooks.on("updateScene", (scene, changes) => {
+  if ( scene.id !== canvas?.scene?.id ) return;
+  if ( !foundry.utils.hasProperty(changes, `flags.${MODULE_ID}.sceneKind`) && !("grid" in changes) ) return;
+  Weather.refreshWeather();
+  ControlPanel.instance.render();
+});
+
 // The shadow sprite belongs to the scene being torn down, so it goes with it and is rebuilt for the next one.
 Hooks.on("canvasTearDown", () => {
-  Clouds.tearDownCloudShadows();
+  Clouds.tearDownClouds();
   Effects.alignToMap();
 });
 

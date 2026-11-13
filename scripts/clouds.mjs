@@ -1,18 +1,19 @@
 import { SETTINGS, clamp, logError, setting } from "./const.mjs";
 import { WEATHER_TYPES } from "./weather-data.mjs";
+import { sceneWeatherView } from "./scene-kind.mjs";
 
 /**
- * Clouds drawn on the canvas rather than over it.
+ * The clouds themselves, drawn on the canvas rather than over it.
  *
- * Two layers share one layout of blobs, so a cloud and the shadow it throws are the same cloud:
- * - the **deck** is the cloud bodies themselves, seen from above. It only makes sense on a map where a grid square
- *   covers real ground, and it fades away as the camera comes down through it.
+ * Two layers share one layout of puffs, so a cloud and the shadow it throws are the same cloud:
+ * - the **deck** is the cloud bodies seen from above, which is what a region map shows,
  * - the **shadow** is what that cover throws onto the ground, offset from the deck by the sun.
  *
- * Both live inside Foundry's own weather layer, which already carries the canvas transform and its masks, so they
- * pan and zoom with the terrain and stay over the same ground.
+ * Which of the two you see, and how much, comes from {@link sceneWeatherView}: the kind of place the scene is and
+ * how far above the cloud deck the camera has climbed. Both sprites live inside Foundry's own weather layer, so
+ * they carry the canvas transform and its masks and stay over the same ground.
  *
- * The textures are drawn at run time — no image ships with the module — and every blob is painted nine times,
+ * The textures are drawn at run time — no image ships with the module — and every puff is painted nine times,
  * wrapped around the edges, so the tiles repeat without a seam.
  */
 
@@ -21,17 +22,14 @@ import { WEATHER_TYPES } from "./weather-data.mjs";
 /** Edge length of the generated textures, in pixels. */
 const TEXTURE_SIZE = 512;
 
-/** How many texture tiles span the scene's shorter side. Larger clouds on larger maps. */
+/** How many texture tiles span the scene's shorter side. */
 const TILES_ACROSS = 2.4;
-
-/** A grid square covering more than this many metres makes a map large enough to look down on clouds. */
-const LARGE_MAP_METRES = 6;
 
 /** How far the sun throws the shadow off the cloud, as a fraction of a tile. */
 const SUN_OFFSET = 0.11;
 
-/** @type {{deck: PIXI.Texture, shadow: PIXI.Texture}|null} */
-let textures = null;
+/** Generated textures, kept per density so a change of dial does not redraw on every frame. */
+const textureCache = new Map();
 
 /** @type {{deck: PIXI.TilingSprite, shadow: PIXI.TilingSprite}|null} */
 let sprites = null;
@@ -47,11 +45,19 @@ let target = { drift: { x: 0, y: 0 }, deck: 0, shadow: 0, tile: 1 };
 /* -------------------------------------------- */
 
 /**
- * Draw the cloud bodies and their shadows from one layout of blobs. Cached, since they never change.
+ * Draw the cloud bodies and their shadows from one layout of puffs.
+ *
+ * A cloud is a cluster of overlapping puffs, wider than it is tall, rather than one circle — a single blob reads
+ * as a cotton ball, a cluster reads as a cloud. Density decides how many clusters there are and how large, which
+ * is what leaves gaps of open sky between them.
+ *
+ * @param {number} density  How much sky the clouds take up, from 0 to 1.
  * @returns {{deck: PIXI.Texture, shadow: PIXI.Texture}|null}
  */
-function cloudTextures() {
-  if ( textures ) return textures;
+function cloudTextures(density) {
+  const key = Math.round(clamp(density, 0, 1) * 20) / 20;
+  if ( textureCache.has(key) ) return textureCache.get(key);
+
   try {
     const size = TEXTURE_SIZE;
 
@@ -59,18 +65,18 @@ function cloudTextures() {
     let seed = 7;
     const random = () => (seed = ((seed * 1103515245) + 12345) % 2147483648) / 2147483648;
 
-    // A cloud is a cluster of overlapping puffs, wider than it is tall, rather than one circle — a single blob
-    // reads as a cotton ball, a cluster reads as a cloud.
+    const clusters = Math.max(2, Math.round(3 + (key * 11)));
+    const puffScale = 0.85 + (key * 0.3);
     const blobs = [];
-    for ( let cluster = 0; cluster < 9; cluster++ ) {
+    for ( let cluster = 0; cluster < clusters; cluster++ ) {
       const cx = random() * size;
       const cy = random() * size;
-      const spread = size * (0.05 + (random() * 0.05));
+      const spread = size * (0.05 + (random() * 0.05)) * puffScale;
       for ( let puff = 0; puff < 6; puff++ ) {
         blobs.push({
           x: cx + ((random() - 0.5) * spread * 2.6),
           y: cy + ((random() - 0.5) * spread * 1.2),
-          radius: size * (0.035 + (random() * 0.055)),
+          radius: size * (0.035 + (random() * 0.055)) * puffScale,
           strength: 0.34 + (random() * 0.2)
         });
       }
@@ -80,7 +86,7 @@ function cloudTextures() {
       const element = document.createElement("canvas");
       element.width = element.height = size;
       const ctx = element.getContext("2d");
-      // The shadow is multiplied onto the ground, so it starts from white; the deck is laid on top of it.
+      // The shadow is multiplied onto the ground, so it starts from white; the deck is laid over it.
       if ( dark ) {
         ctx.fillStyle = "#ffffff";
         ctx.fillRect(0, 0, size, size);
@@ -102,75 +108,13 @@ function cloudTextures() {
       return PIXI.Texture.from(element);
     };
 
-    return textures = { shadow: paint(true), deck: paint(false) };
+    const built = { shadow: paint(true), deck: paint(false) };
+    textureCache.set(key, built);
+    return built;
   } catch(err) {
     logError("Failed to draw the cloud textures", err);
     return null;
   }
-}
-
-/* -------------------------------------------- */
-/*  The map the clouds hang over                */
-/* -------------------------------------------- */
-
-/**
- * How many metres one grid square of a scene covers.
- * @param {Scene} [scene]  Scene to measure; defaults to the one on the canvas.
- * @returns {number}
- */
-export function gridMetresOf(scene=canvas?.scene) {
-  const grid = scene?.grid;
-  if ( !grid ) return 1.5;
-  const distance = Number(grid.distance) || 5;
-  const units = String(grid.units ?? "").toLowerCase().trim();
-  const factors = {
-    km: 1000, kilometer: 1000, kilometre: 1000, kilometers: 1000,
-    mi: 1609.34, mile: 1609.34, miles: 1609.34, meile: 1609.34, meilen: 1609.34,
-    league: 4828, leagues: 4828,
-    m: 1, meter: 1, metre: 1, meters: 1, metres: 1,
-    ft: 0.3048, foot: 0.3048, feet: 0.3048, fuss: 0.3048, "fuß": 0.3048,
-    yd: 0.9144, yard: 0.9144, yards: 0.9144
-  };
-  // An unlabelled grid is feet in most systems, which is the battlemap case.
-  return distance * (factors[units] ?? 0.3048);
-}
-
-/**
- * Is this a map you look down on clouds from, rather than stand under them on?
- * @returns {boolean}
- */
-export function isLargeScaleMap() {
-  return gridMetresOf() > LARGE_MAP_METRES;
-}
-
-/* -------------------------------------------- */
-
-/**
- * Is this client drawing its clouds on the canvas at all?
- * @returns {boolean}
- */
-export function usesCanvasClouds() {
-  return setting(SETTINGS.cloudMode, "auto") !== "off";
-}
-
-/**
- * How visible the cloud deck should be at the current zoom.
- *
- * Coming down through a cloud deck should clear the view, which is what the breakthrough zoom is: above it the
- * camera is below the clouds and sees none of them, below it the deck is in full.
- *
- * @returns {number}  A factor between 0 and 1.
- */
-export function deckVisibility() {
-  const mode = setting(SETTINGS.cloudMode, "auto");
-  if ( (mode === "off") || (mode === "shadows") ) return 0;
-  if ( mode === "deck" ) return 1;
-  if ( !isLargeScaleMap() ) return 0;
-
-  const breakthrough = Math.max(0.1, Number(setting(SETTINGS.cloudBreakthrough, 1.6)) || 1.6);
-  const softness = Math.max(0.05, breakthrough * 0.35);
-  const zoom = canvas?.stage?.scale?.x ?? 1;
-  return clamp((breakthrough + softness - zoom) / (softness * 2), 0, 1);
 }
 
 /* -------------------------------------------- */
@@ -179,15 +123,22 @@ export function deckVisibility() {
 
 /**
  * The two sprites, created and attached on first use.
+ * @param {{deck: PIXI.Texture, shadow: PIXI.Texture}} maps  Textures to draw with.
  * @returns {{deck: PIXI.TilingSprite, shadow: PIXI.TilingSprite}|null}
  */
-function ensureSprites() {
-  if ( sprites && !sprites.deck.destroyed && sprites.deck.parent ) return sprites;
-
+function ensureSprites(maps) {
   const layer = canvas?.weather;
   const rect = canvas?.dimensions?.sceneRect;
-  const maps = cloudTextures();
   if ( !layer || !rect || !maps ) return null;
+
+  if ( sprites && !sprites.deck.destroyed && sprites.deck.parent ) {
+    // A change of density hands over new textures for the same sprites.
+    if ( sprites.deck.texture !== maps.deck ) {
+      sprites.deck.texture = maps.deck;
+      sprites.shadow.texture = maps.shadow;
+    }
+    return sprites;
+  }
 
   const make = (texture, blend) => {
     const sprite = new PIXI.TilingSprite(texture, rect.width, rect.height);
@@ -227,17 +178,19 @@ function ensureSprites() {
  * @param {object} weather   Weather state to draw.
  * @param {object} [moment]  The current moment, whose day decides which way the wind blows.
  */
-export function applyCloudShadows(weather, moment) {
+export function applyClouds(weather, moment) {
   try {
+    const view = sceneWeatherView();
     const cover = WEATHER_TYPES[weather?.type]?.cloud ?? 0;
-    const on = usesCanvasClouds() && (weather?.enabled !== false) && !weather?.muted?.clouds && (cover > 0);
+    const on = !view.indoors && (weather?.enabled !== false) && !weather?.muted?.clouds && (cover > 0);
 
     if ( !on ) {
       if ( sprites && !sprites.deck.destroyed ) sprites.deck.alpha = sprites.shadow.alpha = 0;
       return;
     }
 
-    const layers = ensureSprites();
+    const density = clamp(Number(setting(SETTINGS.cloudDensity, 55)) / 100, 0, 1);
+    const layers = ensureSprites(cloudTextures(density));
     if ( !layers ) return;
 
     const rect = canvas.dimensions.sceneRect;
@@ -253,13 +206,11 @@ export function applyCloudShadows(weather, moment) {
     // A touch larger, so the deck sits visibly above the ground it shades rather than on it.
     layers.deck.tileScale.set(scale * 1.06);
 
-    const strength = clamp(Number(setting(SETTINGS.overlayStrength, 70)) / 100, 0, 1);
-    const mode = setting(SETTINGS.cloudMode, "auto");
-
     // Even a lightly clouded sky needs a visible shadow: the texture is gentle, and multiplying a faint sprite
     // onto the ground comes out as almost nothing.
-    target.shadow = (mode === "deck") ? 0 : clamp((0.45 + (cover * 0.65)) * strength, 0, 1);
-    target.deck = clamp(0.55 + (cover * 0.8), 0, 1) * strength;
+    const opacity = clamp(Number(setting(SETTINGS.cloudOpacity, 70)) / 100, 0, 1);
+    target.deck = clamp(0.55 + (cover * 0.8), 0, 1) * opacity;
+    target.shadow = clamp(0.45 + (cover * 0.65), 0, 1) * opacity;
     target.tile = tile;
 
     // One direction for the whole table, changing from day to day, and faster the stronger the wind.
@@ -277,14 +228,13 @@ export function applyCloudShadows(weather, moment) {
 /* -------------------------------------------- */
 
 /**
- * Re-weigh the deck against the current zoom. Cheap enough to run on every pan.
+ * Re-weigh both layers against the current view. Cheap enough to run on every pan.
  */
 export function updateForView() {
   if ( !sprites || sprites.deck.destroyed ) return;
-  const visible = deckVisibility();
-  sprites.deck.alpha = target.deck * visible;
-  // Under a closed deck the ground is evenly shaded, so the patchy shadow eases off as the deck comes in.
-  sprites.shadow.alpha = target.shadow * (1 - (visible * 0.55));
+  const view = sceneWeatherView();
+  sprites.deck.alpha = target.deck * view.deck;
+  sprites.shadow.alpha = target.shadow * view.shadows;
 }
 
 /* -------------------------------------------- */
@@ -292,7 +242,7 @@ export function updateForView() {
 /**
  * Drop the sprites, for instance when the canvas is torn down. The textures are kept, since they never change.
  */
-export function tearDownCloudShadows() {
+export function tearDownClouds() {
   if ( ticker && canvas?.app?.ticker ) canvas.app.ticker.remove(ticker);
   ticker = null;
   for ( const sprite of Object.values(sprites ?? {}) ) {
