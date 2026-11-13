@@ -104,7 +104,10 @@ Hooks.on("canvasReady", () => {
 });
 
 // The clouds belong to the map, so they have to follow every pan and every zoom.
-Hooks.on("canvasPan", () => Effects.alignToMap());
+Hooks.on("canvasPan", () => {
+  Effects.alignToMap();
+  Clouds.updateForView();
+});
 
 // The shadow sprite belongs to the scene being torn down, so it goes with it and is rebuilt for the next one.
 Hooks.on("canvasTearDown", () => {

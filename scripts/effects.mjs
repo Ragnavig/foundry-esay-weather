@@ -127,7 +127,7 @@ export function applyOverlay(weather) {
   element.className = on ? `ew-${WEATHER_TYPES[weather.type]?.overlay ?? "clear"}` : "ew-off";
 
   // The cloud shadows may be drawn on the canvas instead, in which case the overlay leaves them alone.
-  element.dataset.clouds = setting(SETTINGS.cloudRenderer, "canvas");
+  element.dataset.clouds = usesCanvasClouds() ? "canvas" : "off";
 
   const factor = INTENSITIES[weather.intensity]?.factor ?? 1;
   const strength = clamp(Number(setting(SETTINGS.overlayStrength, 70)) / 100, 0, 1);

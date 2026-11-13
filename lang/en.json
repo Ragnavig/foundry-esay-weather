@@ -186,11 +186,14 @@
   "EASYWEATHER.Settings.PanelFade.Hint": "The panel sits quietly at low opacity and comes back to full as soon as the mouse is over it.",
   "EASYWEATHER.DateLineFestival": "{festival}, {year}",
   "EASYWEATHER.CalendarApp.Festival": "Festival day",
-  "EASYWEATHER.Settings.CloudRenderer.Name": "Cloud shadows",
-  "EASYWEATHER.Settings.CloudRenderer.Hint": "On the canvas, the shadows lie on the ground: they pan and zoom with the map and a shadow stays over the same hill. Over the screen is the older, flatter drawing that sits in front of everything.",
-  "EASYWEATHER.Settings.CloudRenderer.Canvas": "On the map",
-  "EASYWEATHER.Settings.CloudRenderer.Screen": "Over the screen",
-  "EASYWEATHER.Settings.CloudRenderer.Off": "No cloud shadows",
   "EASYWEATHER.Toggle.Clouds": "Cloud shadows",
-  "EASYWEATHER.Toggle.CloudsHint": "Shadows cast on the ground by the cloud cover, drawn on the map itself."
+  "EASYWEATHER.Toggle.CloudsHint": "Shadows cast on the ground by the cloud cover, drawn on the map itself.",
+  "EASYWEATHER.Settings.CloudMode.Name": "Clouds",
+  "EASYWEATHER.Settings.CloudMode.Hint": "What the cloud cover looks like on the canvas. On a map where a grid square covers real ground you look down on a cloud deck; on a battlemap you stand under it and only its shadows reach the floor.",
+  "EASYWEATHER.Settings.CloudMode.Auto": "Decide from the map and the zoom",
+  "EASYWEATHER.Settings.CloudMode.Deck": "Always a cloud deck",
+  "EASYWEATHER.Settings.CloudMode.Shadows": "Only shadows on the ground",
+  "EASYWEATHER.Settings.CloudMode.Off": "No clouds",
+  "EASYWEATHER.Settings.CloudBreakthrough.Name": "Break through the clouds at",
+  "EASYWEATHER.Settings.CloudBreakthrough.Hint": "The zoom at which the camera comes down through the cloud deck and the sky clears. Below it you look down on the clouds, above it you are under them. Only used when the clouds are decided from the map and the zoom."
 }

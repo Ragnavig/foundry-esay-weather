@@ -146,6 +146,28 @@ export function registerSettings() {
     onChange: () => Hooks.callAll("easyWeather.panelVisibilityChanged")
   });
 
+  world(SETTINGS.cloudMode, {
+    name: "EASYWEATHER.Settings.CloudMode.Name",
+    hint: "EASYWEATHER.Settings.CloudMode.Hint",
+    type: String,
+    default: "auto",
+    choices: {
+      auto: "EASYWEATHER.Settings.CloudMode.Auto",
+      deck: "EASYWEATHER.Settings.CloudMode.Deck",
+      shadows: "EASYWEATHER.Settings.CloudMode.Shadows",
+      off: "EASYWEATHER.Settings.CloudMode.Off"
+    },
+    onChange: () => Hooks.callAll("easyWeather.weatherChanged")
+  });
+
+  world(SETTINGS.cloudBreakthrough, {
+    name: "EASYWEATHER.Settings.CloudBreakthrough.Name",
+    hint: "EASYWEATHER.Settings.CloudBreakthrough.Hint",
+    type: new foundry.data.fields.NumberField({ min: 0.1, max: 4, step: 0.05, initial: 1.6, nullable: false }),
+    default: 1.6,
+    onChange: () => Hooks.callAll("easyWeather.weatherChanged")
+  });
+
   /* -------------------------------------------- */
   /*  Client options                              */
   /* -------------------------------------------- */
@@ -157,19 +179,6 @@ export function registerSettings() {
     hint: "EASYWEATHER.Settings.Overlay.Hint",
     type: Boolean,
     default: true,
-    onChange: () => Hooks.callAll("easyWeather.weatherChanged")
-  });
-
-  client(SETTINGS.cloudRenderer, {
-    name: "EASYWEATHER.Settings.CloudRenderer.Name",
-    hint: "EASYWEATHER.Settings.CloudRenderer.Hint",
-    type: String,
-    default: "canvas",
-    choices: {
-      canvas: "EASYWEATHER.Settings.CloudRenderer.Canvas",
-      css: "EASYWEATHER.Settings.CloudRenderer.Screen",
-      off: "EASYWEATHER.Settings.CloudRenderer.Off"
-    },
     onChange: () => Hooks.callAll("easyWeather.weatherChanged")
   });
 

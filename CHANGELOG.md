@@ -2,6 +2,21 @@
 
 All notable changes to this module are documented here.
 
+## 0.2.0
+
+- **Clouds you look down on.** On a map where a grid square covers real ground, the cloud cover is now a deck of
+  clouds drifting over the terrain, not just shadows on it. Zooming in brings the camera down through the deck and
+  the sky clears — the zoom this happens at is a setting.
+- A cloud and the shadow it throws come from the same layout of puffs, offset by the sun, so they belong together.
+  Each cloud is a cluster of overlapping puffs stretched along the wind rather than a circle.
+- New world setting *Clouds*: decide from the map and the zoom, always a deck, only shadows on the ground, or none.
+  Whether a map counts as large is read from what one grid square covers — anything over about six metres, so a
+  five-foot battlemap keeps its shadows and a map in kilometres per hex gets the deck.
+- New world setting *Break through the clouds at*, the zoom where the deck gives way.
+
+**If you also run a module that draws its own clouds**, set *Clouds* to none here, or you will get both skies at
+once.
+
 ## 0.1.1
 
 - **The cloud shadows have a switch of their own.** They were held back by the overlay's switch, so turning the

@@ -52,9 +52,11 @@ picks it up where it left off.
 
 ### What you see
 - Foundry's own particle effects (rain, snow, fog, leaves …) on the current scene or on every scene.
-- **Cloud shadows drawn on the map itself**, inside Foundry's weather layer: they lie on the ground, pan and zoom
-  with it, and are hidden by whatever hides that layer. A shadow is about eight grid squares across and the sky
-  drifts with the wind. Switchable per client between the map, the older screen-space drawing, and none.
+- **Clouds drawn on the map itself**, inside Foundry's weather layer, so they pan and zoom with the ground and are
+  hidden by whatever hides that layer. On a region map you look down on a **deck of clouds** drifting over the
+  terrain; zoom in and the camera comes down through it. On a battlemap you are under the cover and only its
+  **shadows** reach the floor. Cloud and shadow come from the same puffs, offset by the sun, and the whole sky
+  drifts with the wind.
 - A canvas overlay for the rest — tint, haze and a darker rim in rough weather. Only soft, blurred shapes, nothing
   tiled, so it never reads as a pattern over the map. Strength slider per client.
 - Lightning flashes during a thunderstorm.

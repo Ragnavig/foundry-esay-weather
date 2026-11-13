@@ -76,8 +76,8 @@ export class WeatherApp extends HandlebarsApplicationMixin(ApplicationV2) {
         },
         {
           key: "clouds", icon: "fa-cloud", label: loc("EASYWEATHER.Toggle.Clouds"),
-          on: !weather.muted?.clouds && (setting(SETTINGS.cloudRenderer, "canvas") !== "off"),
-          hint: loc("EASYWEATHER.Toggle.CloudsHint"), disabled: !weather.type.cloud
+          on: !weather.muted?.clouds && (setting(SETTINGS.cloudMode, "auto") !== "off"),
+          hint: loc("EASYWEATHER.Toggle.CloudsHint"), disabled: !weather.type.cloud || !game.user.isGM
         },
         {
           key: "overlay", icon: "fa-brush", label: loc("EASYWEATHER.Toggle.Overlay"),
@@ -192,10 +192,10 @@ export class WeatherApp extends HandlebarsApplicationMixin(ApplicationV2) {
 
     // The cloud shadows are drawn by a renderer this client picks, so their own switch is a string rather than a
     // flag. Turning them off here leaves a chosen renderer alone, so turning them on again restores it.
-    const cloudsOff = () => setting(SETTINGS.cloudRenderer, "canvas") === "off";
+    const cloudsOff = () => setting(SETTINGS.cloudMode, "auto") === "off";
 
     if ( !game.user.isGM ) {
-      if ( key === "clouds" ) await setSetting(SETTINGS.cloudRenderer, cloudsOff() ? "canvas" : "off");
+      if ( key === "clouds" ) return;   // the cloud mode belongs to the world, so a player cannot change it
       else if ( clientKey ) await setSetting(clientKey, !setting(clientKey, key !== "sound"));
       this.render(false);
       return;
@@ -204,7 +204,7 @@ export class WeatherApp extends HandlebarsApplicationMixin(ApplicationV2) {
     const muted = isMuted(key);
     // Turning a layer back on should actually show it, even when this screen had switched it off earlier.
     if ( muted && clientKey ) await setSetting(clientKey, true);
-    if ( muted && (key === "clouds") && cloudsOff() ) await setSetting(SETTINGS.cloudRenderer, "canvas");
+    if ( muted && (key === "clouds") && cloudsOff() ) await setSetting(SETTINGS.cloudMode, "auto");
     await muteEffect(key, !muted);
     this.render(false);
   }

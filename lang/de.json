@@ -186,11 +186,14 @@
   "EASYWEATHER.Settings.PanelFade.Hint": "Das Panel liegt dezent im Hintergrund und wird wieder voll sichtbar, sobald die Maus darüber ist.",
   "EASYWEATHER.DateLineFestival": "{festival} {year}",
   "EASYWEATHER.CalendarApp.Festival": "Festtag",
-  "EASYWEATHER.Settings.CloudRenderer.Name": "Wolkenschatten",
-  "EASYWEATHER.Settings.CloudRenderer.Hint": "Auf der Karte liegen die Schatten auf dem Boden: Sie wandern und zoomen mit der Karte, ein Schatten bleibt über demselben Hügel. Über dem Bildschirm ist die ältere, flachere Darstellung, die vor allem anderen liegt.",
-  "EASYWEATHER.Settings.CloudRenderer.Canvas": "Auf der Karte",
-  "EASYWEATHER.Settings.CloudRenderer.Screen": "Über dem Bildschirm",
-  "EASYWEATHER.Settings.CloudRenderer.Off": "Keine Wolkenschatten",
   "EASYWEATHER.Toggle.Clouds": "Wolkenschatten",
-  "EASYWEATHER.Toggle.CloudsHint": "Schatten, die die Bewölkung auf den Boden wirft, direkt auf der Karte gezeichnet."
+  "EASYWEATHER.Toggle.CloudsHint": "Schatten, die die Bewölkung auf den Boden wirft, direkt auf der Karte gezeichnet.",
+  "EASYWEATHER.Settings.CloudMode.Name": "Wolken",
+  "EASYWEATHER.Settings.CloudMode.Hint": "Wie die Bewölkung auf der Karte aussieht. Auf einer Karte, bei der ein Rasterfeld echtes Gelände abdeckt, blickst du von oben auf eine Wolkendecke; auf einer Battlemap stehst du darunter, und nur ihre Schatten erreichen den Boden.",
+  "EASYWEATHER.Settings.CloudMode.Auto": "Nach Karte und Zoom entscheiden",
+  "EASYWEATHER.Settings.CloudMode.Deck": "Immer eine Wolkendecke",
+  "EASYWEATHER.Settings.CloudMode.Shadows": "Nur Schatten auf dem Boden",
+  "EASYWEATHER.Settings.CloudMode.Off": "Keine Wolken",
+  "EASYWEATHER.Settings.CloudBreakthrough.Name": "Wolkendurchbruch bei",
+  "EASYWEATHER.Settings.CloudBreakthrough.Hint": "Der Zoom, bei dem die Kamera durch die Wolkendecke stößt und die Sicht frei wird. Darunter blickst du von oben auf die Wolken, darüber bist du unter ihnen. Gilt nur, wenn die Wolken nach Karte und Zoom entschieden werden."
 }
